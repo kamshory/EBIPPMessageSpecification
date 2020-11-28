@@ -1,7 +1,24 @@
+# Topology
+
+The following is a topological overview of the AltoPay Biller.
+
+```mermaid
+sequenceDiagram
+Collection Agent ->> AltoPay Biller: Payment Request
+AltoPay Biller->>Biller: Payment Request
+Biller->> AltoPay Biller: Payment Response
+AltoPay Biller->> Collection Agent: Payment Response
+Note right of AltoPay Biller: If Biller has not <br>responded to a <br>request for a long <br>time, AltoPay Biller <br>will send an Advice
+AltoPay Biller->>Biller: Advice Request
+Biller->> AltoPay Biller: Advice Response
+AltoPay Biller->>Collection Agent : Payment Response
+```
 
 # Message
 
-## Message Header Rule
+AltoPay Biller uses the ISO 8583 message format for transactions. Because ISO 8583 is designed for asynchronous communication, it takes a message header to separate one message from another message sent sequentially in a single connection. **Message headers and messages must be sent as a package to avoid other _thread_ send other data so that causing message headers and messages not to be sent sequentially**.
+
+## Message Header Definition
 
 Header is 2 bytes before the message. Server will read first 2 bytes, calculate the message length, then read the message according the length.
 
@@ -218,6 +235,76 @@ CD=081198765432
 AT=65000
 ```
 
+**Data Building and Data Parsing Using Java**
+
+```java
+public class TLV {
+	
+private TLV()
+{
+}
+public static JSONObject parse(String data)
+{
+	int remainingLength = 0;
+	int nextOfset = 0;
+	String remaining = data;
+	JSONObject values = new JSONObject();
+	String tag = "";
+	String len = "";
+	String val = "";
+	int itemLength = 0;
+	while(remaining.length() > 4)
+	{
+		tag = remaining.substring(0, 2);
+		len = remaining.substring(2, 4);
+		try
+		{
+			itemLength = Integer.parseInt(len);
+		}
+		catch(NumberFormatException e)
+		{
+			itemLength = 0;
+		}
+		remainingLength = remaining.length();
+		nextOfset = 4+itemLength;
+		if(nextOfset <= remainingLength)
+		{
+			val = remaining.substring(4, nextOfset);
+			remaining = remaining.substring(nextOfset);
+		}
+		else
+		{
+			val = remaining.substring(4);
+			remaining = "";
+		}
+		values.put(tag, val);
+	}
+	return values;		
+}
+
+public static String build(JSONObject jsonObj) 
+{
+	StringBuilder result = new StringBuilder();
+	String tag = "";
+	String value = "";
+	int length = 0;
+	for (String key : jsonObj.keySet()) 
+	{
+	        String keyStr = key;
+	        Object keyvalue = jsonObj.get(keyStr);
+	        tag = keyStr;
+	        if(keyvalue instanceof String)
+	        {
+			value = keyvalue.toString();
+			length = value.length();
+			result.append(String.format("%-2s%02d%s", tag, length, value));	            
+	        }
+	}		
+	return result.toString();
+}
+}
+```
+
 
 ### Field 48 Inquiry and Payment
 | Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Desc                               |
@@ -325,7 +412,7 @@ AT=65000
 	"f32": "360003",
 	"f37": "000000000248",
 	"f39": "00",
-	"f41": "KOI ",
+	"f41": "KOI             ",
 	"f48": "AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY",
 	"f49": "360",
 	"f57": "S018TAGIHAN KARTU HALOS140========================================S233NOMOR PELANGGAN : 081228812348S333NAMA : KAMSHORY ROYS431TAGIHAN : Rp 138.983S534PERIODE : November 2020S631JATUH TEMPO : 2020-12-01S700S840SIMPAN STRUK INI YAH, JANGAN SAMPE ILANG",
@@ -356,7 +443,7 @@ AT=65000
 	"f32": "360003",
 	"f37": "000000000248",
 	"f39": "00",
-	"f41": "KOI ",
+	"f41": "KOI             ",
 	"f48": "AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY",
 	"f49": "360",
 	"f57": "",
@@ -387,7 +474,7 @@ AT=65000
 	"f32": "360003",
 	"f37": "000000000248",
 	"f39": "00",
-	"f41": "KOI ",
+	"f41": "KOI             ",
 	"f48": "AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY",
 	"f49": "360",
 	"f57": "R027STRUK PEMBAYARAN KARTU HALOR140========================================R233NOMOR PELANGGAN : 081228812348R333NAMA : KAMSHORY ROYR431TAGIHAN : Rp 138.983R534PERIODE : November 2020R646WAKTU PEMBAYARAN : 28 November 2020 19:19:26R700R840SIMPAN STRUK INI YAH, JANGAN SAMPE ILANG",
