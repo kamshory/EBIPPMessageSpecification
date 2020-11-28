@@ -13,6 +13,7 @@ AltoPay Biller->>Biller: Advice Request
 Biller->> AltoPay Biller: Advice Response
 AltoPay Biller->>Collection Agent : Payment Response
 ```
+![enter image description here](https://raw.githubusercontent.com/kamshory/EBIPPMessageSpecification/df5dbf3101a2169ffbb80b30000bccbbaa5813bb/ap-biller-topology.svg)
 
 # Message
 
