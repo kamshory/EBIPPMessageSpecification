@@ -44,7 +44,7 @@ or
 | 31283 % 256                   | 51       | 3     |
 | (31283 - (31283 % 256)) / 256 | 122      | z     |
 
-Note: message header is binary data and not always printable. Be careful to `copy and paste` it.
+Note: message header is binary data and not always printable. Be careful to `copy` and `paste` it.
 
 **Message Header Calculating Using Java**
 
@@ -171,6 +171,53 @@ public static long getLength(byte[] header, boolean byteOrder)
 | S127 | Destination Institution Identification Code | N..11 LLLVAR | Biller Identification Code <br>Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
 
 ## Additional Data
+
+AltoPay Biller use TLV (Tag-Length-Value) for some data elements. `Tag` is 2 first bytes represented by `alpha numeic`. `Length` is second 2 bytes represented by `decimal` padded with zero at left side. `Value` is 7 bit ASCII. For binary data, use _base 64 encoding_ or _hexa decimal encoding_ instead.
+
+**Data Building**
+
+For example, we have data bellow:
+
+| Tag | Value                                |
+| --- | ------------------------------------ |
+| PI  | 987654                               |
+| CN  | 081198765432                         |
+| AT  | 65000                               |
+
+So, we can write that data become:
+
+`PI06987654CN12081198765432AT0565000`
+
+**Data Parsing**
+
+For example, he have data bellow:
+
+`PI06987654CN12081198765432AT0565000`
+
+We can parse that data become:
+
+```
+CURRENT OFFSET = 0
+DO
+BEGIN
+	READ 2 BYTE FROM CURRENT OFFSET
+	MAKE IS AS TAG
+	ADD CURRENT OFFSET WITH 2
+	READ 2 BYTE FROM CURRENT OFFSET
+	MAKE IT AS DECIMAL NUMBER REPRESENT DATA LENGTH
+	READ DATA ACCORDING TO ITS LENGTH
+	ADD CURRENT OFFSET WITH DATA LENGTH
+END
+UNTIL CURRENT OFFSET < RAW DATA LENGTH
+```
+
+From algorithm above, we get:
+```
+P1=987654
+CD=081198765432
+AT=65000
+```
+
 
 ### Field 48 Inquiry and Payment
 | Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Desc                               |
