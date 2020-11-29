@@ -569,7 +569,53 @@ ISO Message = "081082200001020100000400000000000000123123235912345605CA12300114A
 
 # Transaction Message Format
 
+Bit 32, 100, 125 and 127 will be informed.
+
 ### Inquiry Request
+
+| DE   | Type and Length    | Description                                  |
+| ---- | ------------------ | -------------------------------------------- |
+| 3    | N 6                | Processing Code                              |
+| 4    | N 12               | Amount                                       |
+| 7    | N 10               | Date and Time in GMT                         |
+| 11   | N 6                | System Trace Audit Number                    |
+| 12   | N 6                | Local Transaction Time                       |
+| 13   | N 4                | Local Transaction Date                       |
+| 15   | N 4                | Settlement Date                              |
+| 18   | N 4                | Channel Type                                 |
+| 32   | AN .. 11 LLVAR     | Acquiring Institution ID (Client Code)       |
+| 37   | AN 12              | Transaction Reference Number                 |
+| 39   | N 2                | Response Code                                |
+| 41   | AN 16              | Card Acceptor Terminal Identification        |
+| 48   | ANS ... 999 LLLVAR | Additional Data                              |
+| 49   | N 3                | Transaction Currency Code                    |
+| 57   | ANS ... 999 LLLVAR | Inquiry Screen and Payment Receipt           |
+| 100  | AN .. 11 LLVAR     | Receiving Institution Identification Code    |
+| 125  | AN .. 255 LLLVAR   | Transaction Indicator                        |
+| 127  | AN .. 11 LLVAR     | Destination Institution Identification Code  |
+
+```
+{
+"f3": "370000",
+"f4": "000000138983",
+"f7": "1127072416",
+"f11": "000004",
+"f12": "142413",
+"f13": "1128",
+"f15": "1128",
+"f18": "6012",
+"f32": "360003",
+"f37": "000000000248",
+"f39": "00",
+"f41": "KOI             ",
+"f48": "AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY",
+"f49": "360",
+"f57": "S018TAGIHAN KARTU HALOS140========================================S233NOMOR PELANGGAN : 081228812348S333NAMA : KAMSHORY ROYS431TAGIHAN : Rp 138.983S534PERIODE : November 2020S631JATUH TEMPO : 2020-12-01S700S840SIMPAN STRUK INI YAH, JANGAN SAMPE ILANG",
+"f100": "1234567",
+"f125": "",
+"f127": "071234567"
+}
+```
 
 **ISO Message**
 
@@ -702,7 +748,7 @@ In this session, we will only discuss bit 48 and bit 57 of ISO 8583. Other bits 
 ## Prepaid Electricity
 
 **Bit 48 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Desc                               |
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
 |-----|-----|---------|---------|---------|---------|------------------------------------|
 | PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
 | CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
@@ -752,7 +798,7 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 ## Postpaid Electricity
 
 **Bit 48 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Desc                               |
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
 |-----|-----|---------|---------|---------|---------|------------------------------------|
 | PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
 | CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
@@ -800,7 +846,7 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 ## Nontaglis Electricity
 
 **Bit 48 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Desc                               |
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
 |-----|-----|---------|---------|---------|---------|------------------------------------|
 | PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
 | CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
