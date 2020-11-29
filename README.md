@@ -312,7 +312,7 @@ public static String build(JSONObject jsonObj)
 
 ## Network Management Message
 
-Bit 48 on Network Management Request sent by client contains
+Field 48 on Network Management Request sent by client contains
 | Tag | Value                     |
 | --- | ------------------------- |
 | AK  | API Key                   |
@@ -320,8 +320,8 @@ Bit 48 on Network Management Request sent by client contains
 | SN  | Signature                 |
 
 Credentials information required:
-1. Client code (sent to server via bit 32)
-2. API Key (sent to server via bit 48)
+1. Client code (sent to server via field  32)
+2. API Key (sent to server via field  48)
 3. Validation Key (not sent to server, required to create signature)
 
 **API Key** is client API Key created by AltoPay Biller on registration.
@@ -550,9 +550,9 @@ The following is a list of data elements
 
 Note:
 
-1. Bit 32, 100, 125 and 127 will be informed
-2. Bit 48 and 57 are TLV
-3. Bit 39 only exists on response
+1. Field 32, 100, 125 and 127 will be informed
+2. Field 48 and 57 are TLV
+3. Field 39 only exists on response
 
 ### Field 32 
 
@@ -784,11 +784,11 @@ ISO message: "0230B23A40010A818080000000001000010A370000000000138983112707241600
 
 # Product Message Specification
 
-In this session, we will only discuss bit 48 and bit 57 of ISO 8583. Other bits are adjusted according to the specifications we discussed in the Transaction Message Format section.
+In this session, we will only discuss field  48 and field  57 of ISO 8583. Other field s are adjusted according to the specifications we discussed in the Transaction Message Format section.
 
 ## Prepaid Electricity
 
-**Bit 48 Inquiry and Payment**
+**Field 48 Inquiry and Payment**
 | Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
 |-----|-----|---------|---------|---------|---------|------------------------------------|
 | PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
@@ -801,7 +801,7 @@ In this session, we will only discuss bit 48 and bit 57 of ISO 8583. Other bits 
 | FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
 | FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
 
-**Bit 57 Inquiry and Payment**
+**Field 57 Inquiry and Payment**
 | Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
 |-----|-----|---------|---------|---------|---------|-----------------|
 | S0  | 50  |         | M       |         |         | Inquiry screen  |
@@ -838,7 +838,7 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 
 ## Postpaid Electricity
 
-**Bit 48 Inquiry and Payment**
+**Field 48 Inquiry and Payment**
 | Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
 |-----|-----|---------|---------|---------|---------|------------------------------------|
 | PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
@@ -849,7 +849,7 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 | FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
 | FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
 
-**Bit 57 Inquiry and Payment**
+**Field 57 Inquiry and Payment**
 | Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
 |-----|-----|---------|---------|---------|---------|-----------------|
 | S0  | 50  |         | M       |         |         | Inquiry screen  |
@@ -886,7 +886,7 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 
 ## Nontaglis Electricity
 
-**Bit 48 Inquiry and Payment**
+**Field 48 Inquiry and Payment**
 | Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
 |-----|-----|---------|---------|---------|---------|------------------------------------|
 | PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
@@ -897,7 +897,7 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 | FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
 | FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
 
-**Bit 57 Inquiry and Payment**
+**Field 57 Inquiry and Payment**
 | Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
 |-----|-----|---------|---------|---------|---------|-----------------|
 | S0  | 50  |         | M       |         |         | Inquiry screen  |
