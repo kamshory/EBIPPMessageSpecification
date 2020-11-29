@@ -666,7 +666,7 @@ ISO Message = "081082200001020100000400000000000000123123235912345605CA12300114A
 
 ### Payment Response
 
-**ISO Mesaage**
+**ISO Message**
 ```
 0210B23A40010A818080000000001000000A80000000000013898311270724160000041424131128112860120636000300000000024800KOI             077AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY360320R027STRUK PEMBAYARAN KARTU HALOR140========================================R233NOMOR PELANGGAN    : 081228812348R333NAMA               : KAMSHORY ROYR431TAGIHAN            : Rp 138.983R534PERIODE            : November 2020R646WAKTU PEMBAYARAN   : 28 November 2020 19:19:26R700R840SIMPAN STRUK INI YAH, JANGAN SAMPE ILANG07123456700009071234567
 ```
@@ -694,6 +694,156 @@ ISO Message = "081082200001020100000400000000000000123123235912345605CA12300114A
 	"f127": "071234567"
 }
 ```
+
+# Product Message Specification
+
+In this session, we will only discuss bit 48 and bit 57 of ISO 8583. Other bits are adjusted according to the specifications we discussed in the Transaction Message Format section.
+
+## Prepaid Electricity
+
+**Bit 48 Inquiry and Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Desc                               |
+|-----|-----|---------|---------|---------|---------|------------------------------------|
+| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
+| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
+| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
+| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
+| AC  | 12  |         | C       | CE      | CE      | Total admin fee                    |
+| C1  | 24  | C       | CE      | CE      | CE      | Customer reference 1               |
+| C2  | 24  | C       | CE      | CE      | CE      | Customer reference 2               |
+| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
+| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+
+**Bit 57 Inquiry and Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
+|-----|-----|---------|---------|---------|---------|-----------------|
+| S0  | 50  |         | M       |         |         | Inquiry screen  |
+| S1  | 50  |         | M       |         |         | Inquiry screen  |
+| S2  | 50  |         | M       |         |         | Inquiry screen  |
+| S3  | 50  |         | M       |         |         | Inquiry screen  |
+| S4  | 50  |         | M       |         |         | Inquiry screen  |
+| S5  | 50  |         | M       |         |         | Inquiry screen  |
+| S6  | 50  |         | M       |         |         | Inquiry screen  |
+| S7  | 50  |         | M       |         |         | Inquiry screen  |
+| S8  | 50  |         | M       |         |         | Inquiry screen  |
+| S9  | 50  |         | M       |         |         | Inquiry screen  |
+| R0  | 50  |         |         |         | M       | Payment receipt |
+| R1  | 50  |         |         |         | M       | Payment receipt |
+| R2  | 50  |         |         |         | M       | Payment receipt |
+| R3  | 50  |         |         |         | M       | Payment receipt |
+| R4  | 50  |         |         |         | M       | Payment receipt |
+| R5  | 50  |         |         |         | M       | Payment receipt |
+| R6  | 50  |         |         |         | M       | Payment receipt |
+| R7  | 50  |         |         |         | M       | Payment receipt |
+| R8  | 50  |         |         |         | M       | Payment receipt |
+| R9  | 50  |         |         |         | M       | Payment receipt |
+| RA  | 50  |         |         |         | M       | Payment receipt |
+| RB  | 50  |         |         |         | M       | Payment receipt |
+| RC  | 50  |         |         |         | M       | Payment receipt |
+| RD  | 50  |         |         |         | M       | Payment receipt |
+| RE  | 50  |         |         |         | M       | Payment receipt |
+| RF  | 50  |         |         |         | M       | Payment receipt |
+| RG  | 50  |         |         |         | M       | Payment receipt |
+| RH  | 50  |         |         |         | M       | Payment receipt |
+| RI  | 50  |         |         |         | M       | Payment receipt |
+
+Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
+
+## Postpaid Electricity
+
+**Bit 48 Inquiry and Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Desc                               |
+|-----|-----|---------|---------|---------|---------|------------------------------------|
+| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
+| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
+| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
+| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
+| AC  | 12  |         | C       | CE      | CE      | Total admin fee                    |
+| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
+| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+
+**Bit 57 Inquiry and Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
+|-----|-----|---------|---------|---------|---------|-----------------|
+| S0  | 50  |         | M       |         |         | Inquiry screen  |
+| S1  | 50  |         | M       |         |         | Inquiry screen  |
+| S2  | 50  |         | M       |         |         | Inquiry screen  |
+| S3  | 50  |         | M       |         |         | Inquiry screen  |
+| S4  | 50  |         | M       |         |         | Inquiry screen  |
+| S5  | 50  |         | M       |         |         | Inquiry screen  |
+| S6  | 50  |         | M       |         |         | Inquiry screen  |
+| S7  | 50  |         | M       |         |         | Inquiry screen  |
+| S8  | 50  |         | M       |         |         | Inquiry screen  |
+| S9  | 50  |         | M       |         |         | Inquiry screen  |
+| R0  | 50  |         |         |         | M       | Payment receipt |
+| R1  | 50  |         |         |         | M       | Payment receipt |
+| R2  | 50  |         |         |         | M       | Payment receipt |
+| R3  | 50  |         |         |         | M       | Payment receipt |
+| R4  | 50  |         |         |         | M       | Payment receipt |
+| R5  | 50  |         |         |         | M       | Payment receipt |
+| R6  | 50  |         |         |         | M       | Payment receipt |
+| R7  | 50  |         |         |         | M       | Payment receipt |
+| R8  | 50  |         |         |         | M       | Payment receipt |
+| R9  | 50  |         |         |         | M       | Payment receipt |
+| RA  | 50  |         |         |         | M       | Payment receipt |
+| RB  | 50  |         |         |         | M       | Payment receipt |
+| RC  | 50  |         |         |         | M       | Payment receipt |
+| RD  | 50  |         |         |         | M       | Payment receipt |
+| RE  | 50  |         |         |         | M       | Payment receipt |
+| RF  | 50  |         |         |         | M       | Payment receipt |
+| RG  | 50  |         |         |         | M       | Payment receipt |
+| RH  | 50  |         |         |         | M       | Payment receipt |
+| RI  | 50  |         |         |         | M       | Payment receipt |
+
+Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
+
+## Nontaglis Electricity
+
+**Bit 48 Inquiry and Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Desc                               |
+|-----|-----|---------|---------|---------|---------|------------------------------------|
+| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
+| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
+| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
+| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
+| AC  | 12  |         | C       | CE      | CE      | Total admin fee                    |
+| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
+| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+
+**Bit 57 Inquiry and Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
+|-----|-----|---------|---------|---------|---------|-----------------|
+| S0  | 50  |         | M       |         |         | Inquiry screen  |
+| S1  | 50  |         | M       |         |         | Inquiry screen  |
+| S2  | 50  |         | M       |         |         | Inquiry screen  |
+| S3  | 50  |         | M       |         |         | Inquiry screen  |
+| S4  | 50  |         | M       |         |         | Inquiry screen  |
+| S5  | 50  |         | M       |         |         | Inquiry screen  |
+| S6  | 50  |         | M       |         |         | Inquiry screen  |
+| S7  | 50  |         | M       |         |         | Inquiry screen  |
+| S8  | 50  |         | M       |         |         | Inquiry screen  |
+| S9  | 50  |         | M       |         |         | Inquiry screen  |
+| R0  | 50  |         |         |         | M       | Payment receipt |
+| R1  | 50  |         |         |         | M       | Payment receipt |
+| R2  | 50  |         |         |         | M       | Payment receipt |
+| R3  | 50  |         |         |         | M       | Payment receipt |
+| R4  | 50  |         |         |         | M       | Payment receipt |
+| R5  | 50  |         |         |         | M       | Payment receipt |
+| R6  | 50  |         |         |         | M       | Payment receipt |
+| R7  | 50  |         |         |         | M       | Payment receipt |
+| R8  | 50  |         |         |         | M       | Payment receipt |
+| R9  | 50  |         |         |         | M       | Payment receipt |
+| RA  | 50  |         |         |         | M       | Payment receipt |
+| RB  | 50  |         |         |         | M       | Payment receipt |
+| RC  | 50  |         |         |         | M       | Payment receipt |
+| RD  | 50  |         |         |         | M       | Payment receipt |
+| RE  | 50  |         |         |         | M       | Payment receipt |
+| RF  | 50  |         |         |         | M       | Payment receipt |
+| RG  | 50  |         |         |         | M       | Payment receipt |
+| RH  | 50  |         |         |         | M       | Payment receipt |
+| RI  | 50  |         |         |         | M       | Payment receipt |
+
+Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
 
 # Appendix
 
