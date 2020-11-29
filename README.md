@@ -1,3 +1,4 @@
+
 # Topology
 
 The following is a topological overview of the AltoPay Biller.
@@ -159,7 +160,7 @@ public static long getLength(byte[] header, boolean byteOrder)
 | P2 | Primary Account Number | N..19 LLVAR | PAN | M | ME | ME | ME |
 | P3 | Processing Code | N 6 | EBIPP: <br>‘37xxxx’ (Inquiry)<br>‘80xxxx’ (Payment) <br>‘80xxxx’ (Reversal) | M | M | ME | ME |
 | P4 | Transaction Amount | N 12 | Inquiry: set all zeroes Payment: Debited Amount Reversal: Debited Amount | M | M | ME | ME |
-| | | | Refer to Section 4. Data Element and Name Definition | | | | |
+| | | |  | | | | |
 | P7 | Transmission Date and | N 10 | In GMT | M | M | M | M |
 | | Time | | Format: MMDDhhmmss | | | | |
 | P11 | System Trace Audit Number | N 6 | Transaction Trace Number. This is Unique per message transmitted. | M | ME | M | ME |
@@ -167,26 +168,27 @@ public static long getLength(byte[] header, boolean byteOrder)
 | P13 | Local Transaction Date | N 4 | Format: MMDD | M | ME | ME | ME |
 | P14 | Expiration Date | N 4 | For Future Use | C | CE | CE | CE |
 | P15 | Settlement Date | N 4 | Format: MMDD | M | ME | ME | ME |
-| P18 | Channel Type | N 4 | Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
-| P22 | Point of Service Entry Mode | N 3 | Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
-| P25 | Point of Service Condition Code | N 2 | Refer to Section 4. Data Element and Name Definition | C | CE | CE | CE |
-| P32 | Acquiring Institution ID | N..11 LLVAR | Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
-| P33 | Forwarding Institution ID | N..11 LLVAR | Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
-| P35 | Track-2 Data | Z..37 LLVAR | Inquiry: OFF <br>Payment: Debit=ON, Credit=OFF Reversal: Debit=ON, Credit=OFF <br>Refer to Section 4. Data Element and Name Definition | C | - | - | - |
-| P37 | Retrieval Reference Number | AN 12 | Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
+| P18 | Channel Type | N 4 |  | M | ME | ME | ME |
+| P22 | Point of Service Entry Mode | N 3 |  | M | ME | ME | ME |
+| P25 | Point of Service Condition Code | N 2 |  | C | CE | CE | CE |
+| P32 | Acquiring Institution ID | N..11 LLVAR |  | M | ME | ME | ME |
+| P33 | Forwarding Institution ID | N..11 LLVAR |  | M | ME | ME | ME |
+| P35 | Track-2 Data | Z..37 LLVAR | Inquiry: OFF <br>Payment: Debit=ON, Credit=OFF Reversal: Debit=ON, Credit=OFF <br> | C | - | - | - |
+| P37 | Retrieval Reference Number | AN 12 |  | M | ME | ME | ME |
 | P39 | Response Code | AN 2 | Response Code | | M | | M |
-| P41 | Card Acceptor Terminal Identification | ANS 16 | Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
-| P42 | Card Acceptor ID | ANS 15 | Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
-| P43 | Card Acceptor Name/Location | ANS 40 | Refer to Section 4. Data Element and Name Definition | M | ME | | |
-| P48 | Additional Data | ANS..999 LLLVAR | Refer to Section 4. Data Element and Name Definition | M | M | ME | ME |
-| P49 | Transaction Currency Code | N 3 | Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
-| P52 | Personal Identification Number (PIN) Data | AN 16 | Inquiry: OFF<br>Payment: Debit=ON, Credit=OFF Reversal: Debit=ON, Credit=OFF<br>Refer to Section 4. Data Element and Name Definition | C | - | - | - |
-| P55 | ICC Data | ANS..765 | Inquiry: OFF <br>Payment: Debit=ON, Credit=OFF Reversal: Debit=ON, Credit=OFF<br>Refer to Section 4. Data Element and Name Definition | C | C | - | - |
-| P57 | Data Payment – National | ANS..999 LLLVAR | Refer to Section 4. Data Element and Name Definition | ME | ME | ME | ME |
-| S90 | Original Data Element | N--42 | Refer to Section 4. Data Element and Name Definition | | | M | ME |
-| S100 | Receiving Institution Identification Code | N..11 LLVAR | Issuer Code <br>Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
-| S125 | Transaction Indicator | N..255 LLLVAR | Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
-| S127 | Destination Institution Identification Code | N..11 LLLVAR | Biller Identification Code <br>Refer to Section 4. Data Element and Name Definition | M | ME | ME | ME |
+| P41 | Card Acceptor Terminal Identification | ANS 16 |  | M | ME | ME | ME |
+| P42 | Card Acceptor ID | ANS 15 |  | M | ME | ME | ME |
+| P43 | Card Acceptor Name/Location | ANS 40 |  | M | ME | | |
+| P48 | Additional Data | ANS..999 LLLVAR |  | M | M | ME | ME |
+| P49 | Transaction Currency Code | N 3 |  | M | ME | ME | ME |
+| P52 | Personal Identification Number (PIN) Data | AN 16 | Inquiry: OFF<br>Payment: Debit=ON, Credit=OFF Reversal: Debit=ON, Credit=OFF<br> | C | - | - | - |
+| P55 | ICC Data | ANS..765 | Inquiry: OFF <br>Payment: Debit=ON, Credit=OFF Reversal: Debit=ON, Credit=OFF<br> | C | C | - | - |
+| P57 | Data Payment – National | ANS..999 LLLVAR |  | ME | ME | ME | ME |
+| S90 | Original Data Element | N--42 |  | | | M | ME |
+| S100 | Receiving Institution Identification Code | N..11 LLVAR | Issuer Code <br> | M | ME | ME | ME |
+| S120 | Key Management | N...999 LLLVAR | Key to make a transaction sent by key exchange response or new key sent by AltoPay Biller | M | ME | ME | ME |
+| S125 | Transaction Indicator | N..255 LLLVAR |  | M | ME | ME | ME |
+| S127 | Destination Institution Identification Code | N..11 LLLVAR | Biller Identification Code <br> | M | ME | ME | ME |
 
 ## Additional Data
 
@@ -306,6 +308,214 @@ public static String build(JSONObject jsonObj)
 }
 ```
 
+# Message Specification
+
+## Network Management Message
+
+Bit 48 on Network Management Request sent by client contains
+| Tag | Value                     |
+| --- | ------------------------- |
+| AK  | API Key                   |
+| TS  | Timestamp in ISO Format   |
+| SN  | Signature                 |
+
+Credentials information required:
+1. Client code (sent to server via bit 32)
+2. API Key (sent to server via bit 48)
+3. Validation Key (not sent to server, required to create signature)
+
+**API Key** is client API Key created by AltoPay Biller on registration.
+
+**Timestamp** is ISO format of time stamp in UTC. Example `2020-12-31T23:59:59.999Z`.
+
+**Signature** is hMac with SHA-256 of API Key and Timestamp. Validation key required as it password.
+
+**Example:**
+
+```java
+String apiKey = "akey_7HgyugUyfuT";
+String validationKey = "vkey_sidcsoi765djcos";
+String timestamp = currentTime("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "UTC");
+String stringToSign = apiKey + ":" + timestamp;
+String rawSignature = hMacSHA256(stringToSign, validationKey);
+String signature = binToHex(rawSignature);
+```
+
+| Name             | Value                                                            |
+| ---------------- | ---------------------------------------------------------------- |
+| Client Code      | CA123                                                            |
+| API Key          | akey_7HgyugUyfuT                                                 |
+| Validation Key   | vkey_sidcsoi765djcos                                             |
+| Time Stamp       | 2020-11-29T07:55:37.653Z                                         |
+| String To Sign   | akey_7HgyugUyfuT:2020-11-29T07:55:37.653Z                        |
+| Signature        | 871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285 |
+
+
+Signature is hMac of API Key and Timestamp with Validation Key as its password.
+
+### Logon
+The client must send a `LOGON` request as soon as it connected. Server will respond the request.
+
+Direction : from client to server
+
+**Logon Request**
+```json
+{
+	"f7":"1231232359",
+	"f11":"123456",
+	"f32":"CA123",
+	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+	"f70":"001"
+}
+```
+
+ISO Message = "080082200001000100000400000000000000123123235912345605CA123114AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285001"
+
+**Logon Response**
+```json
+{
+	"f7":"1231232359",
+	"f11":"123456",
+	"f32":"CA123",
+	"f39":"00",
+	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+	"f70":"001"
+}
+```
+
+ISO Message = "081082200001020100000400000000000000123123235912345605CA12300114AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285001"
+
+### Logoff
+The client must send `LOGOFF` request when they will not send transaction again.
+
+Direction : from client to server
+
+**Logoff Request**
+```json
+{
+	"f7":"1231232359",
+	"f11":"123456",
+	"f32":"CA123",
+	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+	"f70":"002"
+}
+```
+
+ISO Message = "080082200001000100000400000000000000123123235912345605CA123114AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285002"
+
+**Logoff Response**
+```json
+{
+	"f7":"1231232359",
+	"f11":"123456",
+	"f32":"CA123",
+	"f39":"00",
+	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+	"f70":"002"
+}
+```
+
+ISO Message = "081082200001020100000400000000000000123123235912345605CA12300114AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285002"
+
+### Echo Test
+
+Echo Test is used to ensure that a socket connection can be used to send and receive information from both sides.
+
+Direction : from client to server and from server to client
+
+**Echo Test Request**
+```json
+{
+	"f7":"1231232359",
+	"f11":"123456",
+	"f32":"CA123",
+	"f70":"301"
+}
+```
+
+ISO Message = "080082200001000000000400000000000000123123235912345605CA123301"
+
+**Echo Test Response**
+```json
+{
+	"f7":"1231232359",
+	"f11":"123456",
+	"f32":"CA123",
+	"f39":"00",
+	"f70":"301"
+}
+```
+
+ISO Message = "081082200001020000000400000000000000123123235912345605CA12300301"
+
+### Key Exchange
+
+The client request key to the server. The key required to make financial transactions. Server only will process the transaction if key is valid.
+
+Direction : from client to server 
+
+**Key Exchange Request**
+```json
+{
+	"f7":"1231232359",
+	"f11":"123456",
+	"f32":"CA123",
+	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+	"f70":"161"
+}
+```
+
+ISO Message = "080082200001000100000400000000000000123123235912345605CA123114AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285161"
+
+**Key Exchange Response**
+```json
+{
+	"f7":"1231232359",
+	"f11":"123456",
+	"f32":"CA123",
+	"f39":"00",
+	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+	"f70":"161"
+}
+```
+
+ISO Message = "081082200001020100000400000000000000123123235912345605CA12300114AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285161"
+
+### New Key
+
+Server will send new key periodically. Client must use newest key on next transaction. Client must response it with response code **SUCCESS (00)** to make sure that client receive the key.
+
+Direction: from server to client
+
+**New Key Request**
+
+```json
+{
+	"f7":"1231232359",
+	"f11":"123456",
+	"f32":"CA123",
+	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+	"f70":"162"
+}
+```
+
+ISO Message = "080082200001000100000400000000000000123123235912345605CA123114AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285162"
+
+**New Response**
+```json
+{
+	"f7":"1231232359",
+	"f11":"123456",
+	"f32":"CA123",
+	"f39":"00",
+	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+	"f70":"162"
+}
+```
+
+ISO Message = "081082200001020100000400000000000000123123235912345605CA12300114AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285162"
+
+## Financial Transaction Message
 
 ### Field 48 Inquiry and Payment
 | Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Desc                               |
