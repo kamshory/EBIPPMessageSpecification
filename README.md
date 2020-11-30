@@ -1,5 +1,6 @@
 
 
+
 # Topology
 
 The following is a topological overview of the AltoPay Biller.
@@ -14,8 +15,12 @@ Note right of AltoPay Biller: If Biller has not <br>responded to a <br>request f
 AltoPay Biller->>Biller: Advice Request
 Biller->> AltoPay Biller: Advice Response
 AltoPay Biller->>Collection Agent : Payment Response
+Note right of Collection Agent: If AltoPay Biller has <br>not responded to a <br>request for a long <br>time, Collection <br>Agent will send an <br>Advice
+Collection Agent ->> AltoPay Biller: Advice Request
+AltoPay Biller->> Collection Agent: Advice Response
+
 ```
-![enter image description here](https://raw.githubusercontent.com/kamshory/EBIPPMessageSpecification/df5dbf3101a2169ffbb80b30000bccbbaa5813bb/ap-biller-topology.svg)
+![AltoPay Biller Topology](https://raw.githubusercontent.com/kamshory/EBIPPMessageSpecification/b4aec0e43ae6a7f8c23dc8f2902b28b9a9c37534/ap-biller-topology.svg)
 
 # Message
 
@@ -64,102 +69,102 @@ or
 | 31283 % 256                   | 51       | 3     |
 | (31283 - (31283 % 256)) / 256 | 122      | z     |
 
-Note: message header is binary data and not always printable. Be careful to `copy` and `paste` it.
+Note: message header is binary data and not always printable. Be careful when `copy` and `paste` it.
 
 **Message Header Calculating Using Java**
 
 ```java
 class HeaderTool
 {
-private HeaderTool()
-{
-}
-/**
- * Create message header
- * @param messageLength Message length (in byte)
- * @param byteOrder Byte order (true = little endian, false = big endian)
- * @return Byte represent length of message
- */
-public static byte[] createISOLength(long messageLength, boolean byteOrder)
-{
-    byte[] header = new byte[2];
-    if(byteOrder)
-    {
-        header[0] = (byte) ((byte) messageLength & 0xFF);
-        header[1] = (byte) ((byte) (messageLength >> 8) & 0xFF);
-    }
-    else
-    {
-        header[0] = (byte) ((byte) (messageLength >> 8) & 0xFF);
-        header[1] = (byte) ((byte) messageLength & 0xFF);
-    }
-    return header;		
-}
-}
-/**
- * Calculate messahe header
- * @param header Message header
- * @param byteOrder Byte order (true = little endian, false = big endian)
- * @return Actual message length
- * @throws NegativeLengthException if message length is lower than 0
- */
-public static long getLength(byte[] header, boolean byteOrder) 
-{
-    int headerLength = header.length;
-    int i;
-    long result = 0;
-    int x = 0;
-    if(byteOrder)
-    {
-        for(i = headerLength-1; i >= 0; i--)
-        {
-            result *= 256;
-            x = header[i];
-            if(x < 0)
-            {
-                x = x+256;
-            }
-            if(x > 256)
-            {
-                x = x-256;
-            }
-            result += x;
-        }          
-    }
-    else
-    {
-        for(i = 0; i < headerLength; i++)
-        {
-            result *= 256;
-            x = header[i];
-            if(x < 0)
-            {
-                x = x+256;
-            }
-            if(x > 256)
-            {
-                x = x-256;
-            }
-            result += x;
-        }
-    }
-    if(result < 0)
-    {
-        result = 0;
-    }
-    return result;
+	private HeaderTool()
+	{
+	}
+	/**
+	 * Create message header
+	 * @param messageLength Message length (in byte)
+	 * @param byteOrder Byte order (true = little endian, false = big endian)
+	 * @return Byte represent length of message
+	 */
+	public static byte[] createISOLength(long messageLength, boolean byteOrder)
+	{
+	    byte[] header = new byte[2];
+	    if(byteOrder)
+	    {
+	        header[0] = (byte) ((byte) messageLength & 0xFF);
+	        header[1] = (byte) ((byte) (messageLength >> 8) & 0xFF);
+	    }
+	    else
+	    {
+	        header[0] = (byte) ((byte) (messageLength >> 8) & 0xFF);
+	        header[1] = (byte) ((byte) messageLength & 0xFF);
+	    }
+	    return header;		
+	}
+	/**
+	 * Calculate messahe header
+	 * @param header Message header
+	 * @param byteOrder Byte order (true = little endian, false = big endian)
+	 * @return Actual message length
+	 * @throws NegativeLengthException if message length is lower than 0
+	 */
+	public static long getLength(byte[] header, boolean byteOrder) 
+	{
+	    int headerLength = header.length;
+	    int i;
+	    long result = 0;
+	    int x = 0;
+	    if(byteOrder)
+	    {
+	        for(i = headerLength-1; i >= 0; i--)
+	        {
+	            result *= 256;
+	            x = header[i];
+	            if(x < 0)
+	            {
+	                x = x+256;
+	            }
+	            if(x > 256)
+	            {
+	                x = x-256;
+	            }
+	            result += x;
+	        }          
+	    }
+	    else
+	    {
+	        for(i = 0; i < headerLength; i++)
+	        {
+	            result *= 256;
+	            x = header[i];
+	            if(x < 0)
+	            {
+	                x = x+256;
+	            }
+	            if(x > 256)
+	            {
+	                x = x-256;
+	            }
+	            result += x;
+	        }
+	    }
+	    if(result < 0)
+	    {
+	        result = 0;
+	    }
+	    return result;
+	}
 }
 ```
 
 # ISO 8385 Data Element
 
-| DE | Name | Type | Remark | 0200 | 0210 | 0400 | 0420 |
+| DE | Name | Type | Remark | 0200 | 0210 | 0220 | 0230 |
 |---|---|---|---|---|---|---|---|
-| - | Message Type | N 4 | ‘0200’ / ‘0400’ (Request) | M | M | M | M |
+| - | Message Type | N 4 | ‘0200’ / ‘0220’ (Request) | M | M | M | M |
 | - | Primary Bit Map | AN 16 | Mandatory for all Messages | M | M | M | M |
 | P1 | Secondary Bit Map | AN 16 | Only present if any of DE 65 to DE 128 are present. | M | M | M | M |
 | P2 | Primary Account Number | N..19 LLVAR | PAN | M | ME | ME | ME |
-| P3 | Processing Code | N 6 | EBIPP: <br>‘37xxxx’ (Inquiry)<br>‘80xxxx’ (Payment) <br>‘80xxxx’ (Reversal) | M | M | ME | ME |
+| P3 | Processing Code | N 6 | EBIPP: <br>‘37xxxx’ (Inquiry)<br>‘80xxxx’ (Payment) <br>‘80xxxx’ (Advice) | M | M | ME | ME |
 | P4 | Transaction Amount | N 12 | Inquiry: set all zeroes Payment: Debited Amount Reversal: Debited Amount | M | M | ME | ME |
 | | | |  | | | | |
 | P7 | Transmission Date and | N 10 | In GMT | M | M | M | M |
@@ -203,7 +208,7 @@ For example, we have data bellow:
 | --- | ------------------------------------ |
 | PI  | 987654                               |
 | CN  | 081198765432                         |
-| AT  | 65000                               |
+| AT  | 65000                                |
 
 So, we can write that data become:
 
@@ -219,8 +224,7 @@ We can parse that data become:
 
 ```
 CURRENT OFFSET = 0
-DO
-BEGIN
+REPEAT
 	READ 2 BYTE FROM CURRENT OFFSET
 	MAKE IS AS TAG
 	ADD CURRENT OFFSET WITH 2
@@ -228,7 +232,6 @@ BEGIN
 	MAKE IT AS DECIMAL NUMBER REPRESENT DATA LENGTH
 	READ DATA ACCORDING TO ITS LENGTH
 	ADD CURRENT OFFSET WITH DATA LENGTH
-END
 UNTIL CURRENT OFFSET < RAW DATA LENGTH
 ```
 
@@ -313,17 +316,58 @@ public static String build(JSONObject jsonObj)
 
 ## Network Management Message
 
+Network Management Message only applied on asynchronous transaction which keep and maintain its connection. 
+
+| DE  | Type               | Description                          | 0800 | 0810 |
+| --- | ------------------ | ------------------------------------ | ---- | ---- |
+| 7   | N 10               | Transmission Date and Time           | M    | ME   |
+| 11  | N 6                | System Trace Audit Number            | M    | ME   |
+| 32  | ANS .. 99 LLVAR    | Acquiring Institution Code           | M    | ME   |
+| 39  | N 2                | Response Code                        | -    | M   |
+| 48  | ANS ... 999 LLLVAR | Additional Data                      | C    | CE   |
+| 70  | N 3                | Network Management Information Code  | M    | ME   |
+
 Field 48 on Network Management Request sent by client contains
-| Tag | Value                     |
-| --- | ------------------------- |
-| AK  | API Key                   |
-| TS  | Timestamp in ISO Format   |
-| SN  | Signature                 |
+| Tag | Value                        | 0800 | 0810 |
+| --- | ---------------------------- | ---- | ---- |
+| AK  | API Key                      | M    | ME   |
+| TS  | Timestamp in ISO Format      | M    | ME   |
+| SN  | Signature                    | M    | ME   |
+| KM  | Key Management               | -    | M    |
+| EI  | Expires In (Second)          | -    | M    |
+| EA  | Expires At (Unix Timestamp)  | -    | M    |
 
 Credentials information required:
 1. Client code (sent to server via field  32)
 2. API Key (sent to server via field  48)
 3. Validation Key (not sent to server, required to create signature)
+
+Field 48 not required on echo test.
+
+Field 70 is Network Management Information Code
+
+Data element for network management  request
+
+| Code | Description  | 7  | 11 | 32 | 39 | 48 | 70 | 
+| ---- | ------------ | -- | -- | -- | -- | -- | -- |
+| 001  | Logon        | M  | M  | M  | -  | M  | M  |
+| 002  | Logoff       | M  | M  | M  | -  | M  | M  |
+| 161  | Key Exchange | M  | M  | M  | -  | M  | M  |
+| 162  | New Key      | M  | M  | M  | -  | M  | M  |
+| 201  | Cutover      | M  | M  | M  | -  | M  | M  |
+| 301  | Echo Test    | M  | M  | M  | -  | -  | M  |
+ 
+Data element for network management  response
+
+| Code | Description  | 7  | 11 | 32 | 39 | 48 | 70 | 
+| ---- | ------------ | -- | -- | -- | -- | -- | -- |
+| 001  | Logon        | M  | M  | M  | M  | M  | M  |
+| 002  | Logoff       | M  | M  | M  | M  | M  | M  |
+| 161  | Key Exchange | M  | M  | M  | M  | M  | M  |
+| 162  | New Key      | M  | M  | M  | M  | M  | M  |
+| 201  | Cutover      | M  | M  | M  | M  | M  | M  |
+| 301  | Echo Test    | M  | M  | M  | M  | -  | M  |
+ 
 
 **API Key** is client API Key created by AltoPay Biller on registration.
 
@@ -362,29 +406,29 @@ Direction : from client to server
 **Logon Request**
 ```json
 {
-	"f7":"1231232359",
-	"f11":"123456",
-	"f32":"CA123",
-	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
-	"f70":"001"
+"f7": "1127072416",
+"f11": "000004",
+"f32": "CA123",
+"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+"f70":"001"
 }
 ```
 
-ISO Message = "080082200001000100000400000000000000123123235912345605CA123116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285001"
+ISO Message = "080082200001000100000400000000000000112707241600000405CA123116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285001"
 
 **Logon Response**
 ```json
 {
-	"f7":"1231232359",
-	"f11":"123456",
-	"f32":"CA123",
-	"f39":"00",
-	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN86471f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
-	"f70":"001"
+"f7": "1127072416",
+"f11": "000004",
+"f32": "CA123",
+"f39": "00",
+"f48": "KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z",
+"f70": "001"
 }
 ```
 
-ISO Message = "081082200001020100000400000000000000123123235912345605CA12300116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285001"
+ISO Message = "081082200001020100000400000000000000112707241600000405CA12300266KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z001"
 
 ### Logoff
 The client must send `LOGOFF` request when they will not send transaction again.
@@ -394,29 +438,29 @@ Direction : from client to server
 **Logoff Request**
 ```json
 {
-	"f7":"1231232359",
-	"f11":"123456",
-	"f32":"CA123",
-	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
-	"f70":"002"
+"f7": "1127072416",
+"f11": "000004",
+"f32": "CA123",
+"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+"f70":"002"
 }
 ```
 
-ISO Message = "080082200001000100000400000000000000123123235912345605CA123116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285002"
+ISO Message = "080082200001000100000400000000000000112707241600000405CA123116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285002"
 
 **Logoff Response**
 ```json
 {
-	"f7":"1231232359",
-	"f11":"123456",
-	"f32":"CA123",
-	"f39":"00",
-	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
-	"f70":"002"
+"f7": "1127072416",
+"f11": "000004",
+"f32": "CA123",
+"f39": "00",
+"f48": "KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z",
+"f70": "002"
 }
 ```
 
-ISO Message = "081082200001020100000400000000000000123123235912345605CA12300116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285002"
+ISO Message = "081082200001020100000400000000000000112707241600000405CA12300266KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z002"
 
 ### Echo Test
 
@@ -455,32 +499,33 @@ The client request key to the server. The key required to make financial transac
 
 Direction : from client to server 
 
+
 **Key Exchange Request**
 ```json
 {
-	"f7":"1231232359",
-	"f11":"123456",
-	"f32":"CA123",
-	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
-	"f70":"161"
+"f7": "1127072416",
+"f11": "000004",
+"f32": "CA123",
+"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+"f70":"161"
 }
 ```
 
-ISO Message = "080082200001000100000400000000000000123123235912345605CA123116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285161"
+ISO Message = "080082200001000100000400000000000000112707241600000405CA123116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285161"
 
 **Key Exchange Response**
 ```json
 {
-	"f7":"1231232359",
-	"f11":"123456",
-	"f32":"CA123",
-	"f39":"00",
-	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
-	"f70":"161"
+"f7": "1127072416",
+"f11": "000004",
+"f32": "CA123",
+"f39": "00",
+"f48": "KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z",
+"f70": "161"
 }
 ```
 
-ISO Message = "081082200001020100000400000000000000123123235912345605CA12300116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285161"
+ISO Message = "081082200001020100000400000000000000112707241600000405CA12300266KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z161"
 
 ### New Key
 
@@ -488,38 +533,33 @@ Server will send new key periodically. Client must use newest key on next transa
 
 Direction: from server to client
 
+
 **New Key Request**
-
 ```json
 {
-	"f7":"1231232359",
-	"f11":"123456",
-	"f32":"CA123",
-	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
-	"f70":"162"
+"f7": "1127072416",
+"f11": "000004",
+"f32": "CA123",
+"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+"f70":"161"
 }
 ```
 
-ISO Message = "080082200001000100000400000000000000123123235912345605CA123116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285162"
+ISO Message = "080082200001000100000400000000000000112707241600000405CA123116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285162"
 
-**New Response**
+**New Key Response**
 ```json
 {
-	"f7":"1231232359",
-	"f11":"123456",
-	"f32":"CA123",
-	"f39":"00",
-	"f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
-	"f70":"162"
+"f7": "1127072416",
+"f11": "000004",
+"f32": "CA123",
+"f39": "00",
+"f48": "KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z",
+"f70": "162"
 }
 ```
 
-ISO Message = "081082200001020100000400000000000000123123235912345605CA12300116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285162"
-
-
-
-
-
+ISO Message = "081082200001020100000400000000000000112707241600000405CA12300266KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z162"
 
 # Transaction Message Format
 
