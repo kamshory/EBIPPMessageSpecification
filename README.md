@@ -3,7 +3,17 @@
 
 # Topology
 
-The following is a topological overview of the AltoPay Biller.
+The following is sequence diagram for inquiry process
+
+```mermaid
+sequenceDiagram
+Collection Agent ->> AltoPay Biller: Inquiry Request
+AltoPay Biller->>Biller: Inquiry Request
+Biller->> AltoPay Biller: Inquiry Response
+AltoPay Biller->> Collection Agent: Inquiry Response
+```
+
+The following is sequence diagram for payment process
 
 ```mermaid
 sequenceDiagram
@@ -11,16 +21,29 @@ Collection Agent ->> AltoPay Biller: Payment Request
 AltoPay Biller->>Biller: Payment Request
 Biller->> AltoPay Biller: Payment Response
 AltoPay Biller->> Collection Agent: Payment Response
-Note right of AltoPay Biller: If Biller has not <br>responded to a <br>request for a long <br>time, AltoPay Biller <br>will send an Advice
+Note right of AltoPay Biller: If Biller has not <br>responded to a <br>request for a long <br>time, AltoPay Biller <br>will send an Advice<br>Request to Biller
 AltoPay Biller->>Biller: Advice Request
 Biller->> AltoPay Biller: Advice Response
 AltoPay Biller->>Collection Agent : Payment Response
-Note right of Collection Agent: If AltoPay Biller has <br>not responded to a <br>request for a long <br>time, Collection <br>Agent will send an <br>Advice
+Note right of Collection Agent: If AltoPay Biller has <br>not responded to a <br>request for a long <br>time, Collection <br>Agent will send an <br>Advice Request to <br>Biller
 Collection Agent ->> AltoPay Biller: Advice Request
 AltoPay Biller->> Collection Agent: Advice Response
 
 ```
-![AltoPay Biller Topology](https://raw.githubusercontent.com/kamshory/EBIPPMessageSpecification/b4aec0e43ae6a7f8c23dc8f2902b28b9a9c37534/ap-biller-topology.svg)
+
+The following is sequence diagram for advice process
+
+```mermaid
+sequenceDiagram
+Collection Agent ->> AltoPay Biller: Advice Request
+AltoPay Biller->>Biller: Advice Request
+Biller->> AltoPay Biller: Advice Response
+AltoPay Biller->> Collection Agent: Advice Response
+Note right of AltoPay Biller: If AltoPay Biller ha<br>no information<br>about payment <br>response, AltoPay <br>Biller will send an <br>Advice Request <br>to Biller
+AltoPay Biller->>Biller: Advice Request
+Biller->> AltoPay Biller: Advice Response
+AltoPay Biller->>Collection Agent : Advice Response
+```
 
 # Message
 
@@ -76,83 +99,83 @@ Note: message header is binary data and not always printable. Be careful when `c
 ```java
 class HeaderTool
 {
-	private HeaderTool()
-	{
-	}
-	/**
-	 * Create message header
-	 * @param messageLength Message length (in byte)
-	 * @param byteOrder Byte order (true = little endian, false = big endian)
-	 * @return Byte represent length of message
-	 */
-	public static byte[] createISOLength(long messageLength, boolean byteOrder)
-	{
-	    byte[] header = new byte[2];
-	    if(byteOrder)
-	    {
-	        header[0] = (byte) ((byte) messageLength & 0xFF);
-	        header[1] = (byte) ((byte) (messageLength >> 8) & 0xFF);
-	    }
-	    else
-	    {
-	        header[0] = (byte) ((byte) (messageLength >> 8) & 0xFF);
-	        header[1] = (byte) ((byte) messageLength & 0xFF);
-	    }
-	    return header;		
-	}
-	/**
-	 * Calculate messahe header
-	 * @param header Message header
-	 * @param byteOrder Byte order (true = little endian, false = big endian)
-	 * @return Actual message length
-	 * @throws NegativeLengthException if message length is lower than 0
-	 */
-	public static long getLength(byte[] header, boolean byteOrder) 
-	{
-	    int headerLength = header.length;
-	    int i;
-	    long result = 0;
-	    int x = 0;
-	    if(byteOrder)
-	    {
-	        for(i = headerLength-1; i >= 0; i--)
-	        {
-	            result *= 256;
-	            x = header[i];
-	            if(x < 0)
-	            {
-	                x = x+256;
-	            }
-	            if(x > 256)
-	            {
-	                x = x-256;
-	            }
-	            result += x;
-	        }          
-	    }
-	    else
-	    {
-	        for(i = 0; i < headerLength; i++)
-	        {
-	            result *= 256;
-	            x = header[i];
-	            if(x < 0)
-	            {
-	                x = x+256;
-	            }
-	            if(x > 256)
-	            {
-	                x = x-256;
-	            }
-	            result += x;
-	        }
-	    }
-	    if(result < 0)
-	    {
-	        result = 0;
-	    }
-	    return result;
-	}
+private HeaderTool()
+{
+}
+/**
+ * Create message header
+ * @param messageLength Message length (in byte)
+ * @param byteOrder Byte order (true = little endian, false = big endian)
+ * @return Byte represent length of message
+ */
+public static byte[] createISOLength(long messageLength, boolean byteOrder)
+{
+    byte[] header = new byte[2];
+    if(byteOrder)
+    {
+        header[0] = (byte) ((byte) messageLength & 0xFF);
+        header[1] = (byte) ((byte) (messageLength >> 8) & 0xFF);
+    }
+    else
+    {
+        header[0] = (byte) ((byte) (messageLength >> 8) & 0xFF);
+        header[1] = (byte) ((byte) messageLength & 0xFF);
+    }
+    return header;		
+}
+/**
+ * Calculate messahe header
+ * @param header Message header
+ * @param byteOrder Byte order (true = little endian, false = big endian)
+ * @return Actual message length
+ * @throws NegativeLengthException if message length is lower than 0
+ */
+public static long getLength(byte[] header, boolean byteOrder) 
+{
+    int headerLength = header.length;
+    int i;
+    long result = 0;
+    int x = 0;
+    if(byteOrder)
+    {
+        for(i = headerLength-1; i >= 0; i--)
+        {
+            result *= 256;
+            x = header[i];
+            if(x < 0)
+            {
+                x = x+256;
+            }
+            if(x > 256)
+            {
+                x = x-256;
+            }
+            result += x;
+        }          
+    }
+    else
+    {
+        for(i = 0; i < headerLength; i++)
+        {
+            result *= 256;
+            x = header[i];
+            if(x < 0)
+            {
+                x = x+256;
+            }
+            if(x > 256)
+            {
+                x = x-256;
+            }
+            result += x;
+        }
+    }
+    if(result < 0)
+    {
+        result = 0;
+    }
+    return result;
+}
 }
 ```
 
@@ -220,17 +243,15 @@ For example, he have data bellow:
 
 `PI06987654CN12081198765432AT0565000`
 
-We can parse that data become:
+We can parse that with algorithm:
 
 ```
 CURRENT OFFSET = 0
 REPEAT
-	READ 2 BYTE FROM CURRENT OFFSET
-	MAKE IS AS TAG
+	READ 2 BYTE FROM CURRENT OFFSET AND MAKE IS AS TAG
 	ADD CURRENT OFFSET WITH 2
-	READ 2 BYTE FROM CURRENT OFFSET
-	MAKE IT AS DECIMAL NUMBER REPRESENT DATA LENGTH
-	READ DATA ACCORDING TO ITS LENGTH
+	READ 2 BYTE FROM CURRENT OFFSET AND MAKE IT AS DECIMAL NUMBER REPRESENT DATA LENGTH
+	READ DATA ACCORDING TO ITS LENGTH AND PUT IT ON CURRENT TAG
 	ADD CURRENT OFFSET WITH DATA LENGTH
 UNTIL CURRENT OFFSET < RAW DATA LENGTH
 ```
@@ -326,6 +347,7 @@ Network Management Message only applied on asynchronous transaction which keep a
 | 39  | N 2                | Response Code                        | -    | M   |
 | 48  | ANS ... 999 LLLVAR | Additional Data                      | C    | CE   |
 | 70  | N 3                | Network Management Information Code  | M    | ME   |
+| 120 | ANS ... 999 LLLVAR | Key Management                       | -    | C   |
 
 Field 48 on Network Management Request sent by client contains
 | Tag | Value                        | 0800 | 0810 |
@@ -333,9 +355,6 @@ Field 48 on Network Management Request sent by client contains
 | AK  | API Key                      | M    | ME   |
 | TS  | Timestamp in ISO Format      | M    | ME   |
 | SN  | Signature                    | M    | ME   |
-| KM  | Key Management               | -    | M    |
-| EI  | Expires In (Second)          | -    | M    |
-| EA  | Expires At (Unix Timestamp)  | -    | M    |
 
 Credentials information required:
 1. Client code (sent to server via field  32)
@@ -348,25 +367,25 @@ Field 70 is Network Management Information Code
 
 Data element for network management  request
 
-| Code | Description  | 7  | 11 | 32 | 39 | 48 | 70 | 
-| ---- | ------------ | -- | -- | -- | -- | -- | -- |
-| 001  | Logon        | M  | M  | M  | -  | M  | M  |
-| 002  | Logoff       | M  | M  | M  | -  | M  | M  |
-| 161  | Key Exchange | M  | M  | M  | -  | M  | M  |
-| 162  | New Key      | M  | M  | M  | -  | M  | M  |
-| 201  | Cutover      | M  | M  | M  | -  | M  | M  |
-| 301  | Echo Test    | M  | M  | M  | -  | -  | M  |
+| Code | Description  | 7  | 11 | 32 | 39 | 48 | 70 | 120 | 
+| ---- | ------------ | -- | -- | -- | -- | -- | -- | --- |
+| 001  | Logon        | M  | M  | M  | -  | M  | M  | -   |
+| 002  | Logoff       | M  | M  | M  | -  | M  | M  | -   |
+| 161  | Key Exchange | M  | M  | M  | -  | M  | M  | -   |
+| 162  | New Key      | M  | M  | M  | -  | M  | M  | M   |
+| 201  | Cutover      | M  | M  | M  | -  | M  | M  | -   |
+| 301  | Echo Test    | M  | M  | M  | -  | -  | M  | -   |
  
 Data element for network management  response
 
-| Code | Description  | 7  | 11 | 32 | 39 | 48 | 70 | 
-| ---- | ------------ | -- | -- | -- | -- | -- | -- |
-| 001  | Logon        | M  | M  | M  | M  | M  | M  |
-| 002  | Logoff       | M  | M  | M  | M  | M  | M  |
-| 161  | Key Exchange | M  | M  | M  | M  | M  | M  |
-| 162  | New Key      | M  | M  | M  | M  | M  | M  |
-| 201  | Cutover      | M  | M  | M  | M  | M  | M  |
-| 301  | Echo Test    | M  | M  | M  | M  | -  | M  |
+| Code | Description  | 7  | 11 | 32 | 39 | 48 | 70 | 120 |
+| ---- | ------------ | -- | -- | -- | -- | -- | -- | --- |
+| 001  | Logon        | M  | M  | M  | M  | M  | M  | M   |
+| 002  | Logoff       | M  | M  | M  | M  | M  | M  | -   |
+| 161  | Key Exchange | M  | M  | M  | M  | M  | M  | M   |
+| 162  | New Key      | M  | M  | M  | M  | M  | M  | -   |
+| 201  | Cutover      | M  | M  | M  | M  | M  | M  | -   |
+| 301  | Echo Test    | M  | M  | M  | M  | -  | M  | -   |
  
 
 **API Key** is client API Key created by AltoPay Biller on registration.
@@ -423,19 +442,21 @@ ISO Message = "080082200001000100000400000000000000112707241600000405CA123116AK1
 "f11": "000004",
 "f32": "CA123",
 "f39": "00",
-"f48": "KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z",
-"f70": "001"
+"f48": "AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+"f70": "001",
+"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEyNTQ0fQ.oSHXM_Dh4_FCQWPMXXQzogml7NNgPE-UJxWYbNyTt9g"
 }
 ```
 
-ISO Message = "081082200001020100000400000000000000112707241600000405CA12300266KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z001"
+ISO Message = "081082200001020100000400000000000100112707241600000405CA12300116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285001123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEyNjg1fQ.hhYZ53A1Q4yK6A4PeqIz23AfaGOgyzdH1Fare3eUNYM"
 
 ### Logoff
 The client must send `LOGOFF` request when they will not send transaction again.
 
 Direction : from client to server
 
-**Logoff Request**
+
+**Logon Request**
 ```json
 {
 "f7": "1127072416",
@@ -448,19 +469,20 @@ Direction : from client to server
 
 ISO Message = "080082200001000100000400000000000000112707241600000405CA123116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285002"
 
-**Logoff Response**
+**Logon Response**
 ```json
 {
 "f7": "1127072416",
 "f11": "000004",
 "f32": "CA123",
 "f39": "00",
-"f48": "KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z",
-"f70": "002"
+"f48": "AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+"f70": "002",
+"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEyNTQ0fQ.oSHXM_Dh4_FCQWPMXXQzogml7NNgPE-UJxWYbNyTt9g"
 }
 ```
 
-ISO Message = "081082200001020100000400000000000000112707241600000405CA12300266KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z002"
+ISO Message = "081082200001020100000400000000000100112707241600000405CA12300116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285002123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEyNjg1fQ.hhYZ53A1Q4yK6A4PeqIz23AfaGOgyzdH1Fare3eUNYM"
 
 ### Echo Test
 
@@ -499,8 +521,8 @@ The client request key to the server. The key required to make financial transac
 
 Direction : from client to server 
 
-
 **Key Exchange Request**
+
 ```json
 {
 "f7": "1127072416",
@@ -520,12 +542,13 @@ ISO Message = "080082200001000100000400000000000000112707241600000405CA123116AK1
 "f11": "000004",
 "f32": "CA123",
 "f39": "00",
-"f48": "KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z",
-"f70": "161"
+"f48": "AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+"f70": "161",
+"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEyNTQ0fQ.oSHXM_Dh4_FCQWPMXXQzogml7NNgPE-UJxWYbNyTt9g"
 }
 ```
 
-ISO Message = "081082200001020100000400000000000000112707241600000405CA12300266KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z161"
+ISO Message = "081082200001020100000400000000000100112707241600000405CA12300116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285161123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEyNjg1fQ.hhYZ53A1Q4yK6A4PeqIz23AfaGOgyzdH1Fare3eUNYM"
 
 ### New Key
 
@@ -533,35 +556,36 @@ Server will send new key periodically. Client must use newest key on next transa
 
 Direction: from server to client
 
+**Key Exchange Request**
 
-**New Key Request**
 ```json
 {
 "f7": "1127072416",
 "f11": "000004",
 "f32": "CA123",
 "f48":"AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
-"f70":"161"
+"f70":"162"
 }
 ```
 
 ISO Message = "080082200001000100000400000000000000112707241600000405CA123116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285162"
 
-**New Key Response**
+**Key Exchange Response**
 ```json
 {
 "f7": "1127072416",
 "f11": "000004",
 "f32": "CA123",
 "f39": "00",
-"f48": "KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z",
-"f70": "162"
+"f48": "AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285",
+"f70": "162",
+"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEyNTQ0fQ.oSHXM_Dh4_FCQWPMXXQzogml7NNgPE-UJxWYbNyTt9g"
 }
 ```
 
-ISO Message = "081082200001020100000400000000000000112707241600000405CA12300266KM123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEwNDg2fQ.oCPVl9htbj5W8pBWkyXj0YkhUJ84WpsLN8ilgVnCBw0EI043610AK16akey_7HgyugUyfuTSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285EA101606710486TS242020-11-29T07:55:37.653Z162"
+ISO Message = "081082200001020100000400000000000100112707241600000405CA12300116AK16akey_7HgyugUyfuTTS242020-11-29T07:55:37.653ZSN64871f7de75762871769c7ec7b0b3f62d154c6c8f244914c076d25cb60972a9285162123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzEyNjg1fQ.hhYZ53A1Q4yK6A4PeqIz23AfaGOgyzdH1Fare3eUNYM"
 
-# Transaction Message Format
+# Financial Transaction Message Format
 
 ## Data Elements
 
@@ -671,74 +695,115 @@ Field 32 is filled by `Destination Code`. Destination code will be informed to c
 "f13": "1128",
 "f15": "1128",
 "f18": "6012",
-"f32": "360003",
+"f32": "alto",
 "f37": "000000000248",
 "f41": "KOI ",
-"f48": "PI06013026CN12081228812348AC042500",
+"f48": "PI06054501CN12522030064594AC042500",
 "f49": "360",
 "f100": "1234567",
-"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD8",
+"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzIyMTI5fQ.tyJ5WjfiuuG3AH5ugaXlNNXPlZocDJnPpsnC7x-12_M",
 "f125": "",
 "f127": "071234567"
 }
 ```
 
-ISO message: "0200B23A400108818000000000001000010A370000000000000000112707241600000414241311281128601206360003000000000248KOI             034PI06013026CN12081228812348AC042500360071234567123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD800009071234567"
+ISO message: "0200B23A400108818000000000001000010A370000000000000000112707241600000414241311281128601204alto000000000248KOI             034PI06054501CN12522030064594AC042500360071234567123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzIyMTI5fQ.tyJ5WjfiuuG3AH5ugaXlNNXPlZocDJnPpsnC7x-12_M00009071234567"
+
+**TLV Data on Field 48 Request**
+| TAG | VALUE        | 
+| --- | ------------ | 
+| AC  | 2500         | 
+| PI  | 054501       | 
+| CN  | 522030064594 | 
 
 ### Inquiry Response
 
 ```json
 {
-"f125": "",
+"f125": "071234567",
 "f41": "KOI ",
-"f32": "360003",
+"f32": "alto",
 "f100": "1234567",
 "f12": "142413",
-"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD8",
+"f120": "",
 "f11": "000004",
 "f13": "1128",
-"f57": "S018TAGIHAN KARTU HALOS140========================================S233NOMOR PELANGGAN : 081228812348S333NAMA : KAMSHORY ROYS431TAGIHAN : Rp 138.983S534PERIODE : November 2020S631JATUH TEMPO : 2020-12-01S700S840SIMPAN STRUK INI YAH, JANGAN SAMPE ILANG",
+"f57": "S025INFORMASI TAGIHAN LISTRIKS100S220BILLER : PLN PREPAIDS326IDPEL : 522030064594S432NAMA : Customer 2 Bulan 4S525BL/TH : SEP20,OKT20S622TOTAL TGHN : 2 BULANS732RP TAG PLN : RP 690.000S832ADMIN BANK : RP 2.500S932TOTAL BAYAR : RP 692.500",
 "f49": "360",
 "f15": "1128",
 "f37": "000000000248",
-"f48": "AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY",
+"f48": "AC042500PI06054501CN12522030064594FR12000000000016FS06000016NM18Customer 2 Bulan 4",
 "f18": "6012",
 "f3": "370000",
 "f39": "00",
-"f4": "000000138983",
+"f4": "000000690000",
 "f7": "1127072416",
-"f127": "071234567"
+"f127": ""
 }
 ```
 
-ISO message: "0210B23A40010A818080000000001000010A37000000000013898311270724160000041424131128112860120636000300000000024800KOI             077AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY360296S018TAGIHAN KARTU HALOS140========================================S233NOMOR PELANGGAN    : 081228812348S333NAMA               : KAMSHORY ROYS431TAGIHAN            : Rp 138.983S534PERIODE            : November 2020S631JATUH TEMPO        : 2020-12-01S700S840SIMPAN STRUK INI YAH, JANGAN SAMPE ILANG071234567123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD800009071234567"
+ISO message: "0210B23A40010A818080000000001000010A370000000000690000112707241600000414241311281128601204alto00000000024800KOI             082AC042500PI06054501CN12522030064594FR12000000000016FS06000016NM18Customer 2 Bulan 4360286S025INFORMASI TAGIHAN LISTRIKS100S220BILLER : PLN PREPAIDS326IDPEL       : 522030064594S432NAMA        : Customer 2 Bulan 4S525BL/TH       : SEP20,OKT20S622TOTAL TGHN  :  2 BULANS732RP TAG PLN  : RP         690.000S832ADMIN BANK  : RP           2.500S932TOTAL BAYAR : RP         692.50007123456700009071234567"
+
+**TLV Data on Field 48 Response**
+| TAG | VALUE              | 
+| --- | ------------------ | 
+| AC  | 2500               | 
+| PI  | 054501             | 
+| CN  | 522030064594       | 
+| FR  | 000000000016       | 
+| FS  | 000016             | 
+| NM  | Customer 2 Bulan 4 | 
+
+**TLV Data on Field 57 Response**
+| TAG | VALUE                            | 
+| --- | -------------------------------- | 
+| S0  | INFORMASI TAGIHAN LISTRIK        | 
+| S1  |                                  | 
+| S2  | BILLER : PLN PREPAID             | 
+| S3  | IDPEL       : 522030064594       | 
+| S4  | NAMA        : Customer 2 Bulan 4 | 
+| S5  | BL/TH       : SEP20,OKT20        | 
+| S6  | TOTAL TGHN  :  2 BULAN           | 
+| S7  | RP TAG PLN  : RP         690.000 | 
+| S8  | ADMIN BANK  : RP           2.500 | 
+| S9  | TOTAL BAYAR : RP         692.500 | 
 
 ### Payment Request
 
 ```json
 {
-"f125": "",
+"f125": "071234567",
 "f41": "KOI ",
-"f32": "360003",
+"f32": "alto",
 "f100": "1234567",
 "f12": "142413",
-"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD8",
 "f11": "000004",
 "f13": "1128",
 "f57": "",
 "f49": "360",
 "f15": "1128",
 "f37": "000000000248",
-"f48": "AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY",
+"f48": "AC042500PI06054501CN12522030064594FR12000000000016FS06000016NM18Customer 2 Bulan 4",
 "f18": "6012",
-"f3": "370000",
-"f4": "000000138983",
+"f3": "800000",
+"f4": "000000300000",
 "f7": "1127072416",
-"f127": "071234567"
+"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzI2MzMxfQ.zuX4w0HSPVrJS7zLZMETsjQr1a7J1YGbdVZDECrPieE",
+"f127": ""
 }
 ```
 
-ISO message: "0200B23A400108818080000000001000010A370000000000138983112707241600000414241311281128601206360003000000000248KOI             077AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY360000071234567123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD800009071234567"
+ISO message: "0200B23A400108818080000000001000010A800000000000300000112707241600000414241311281128601204alto000000000248KOI             082AC042500PI06054501CN12522030064594FR12000000000016FS06000016NM18Customer 2 Bulan 4360000071234567123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzI2MzMxfQ.zuX4w0HSPVrJS7zLZMETsjQr1a7J1YGbdVZDECrPieE09071234567000"
+
+**TLV Data on Field 48 Request**
+| TAG | VALUE              | 
+| --- | ------------------ | 
+| AC  | 2500               | 
+| PI  | 054501             | 
+| CN  | 522030064594       | 
+| FR  | 000000000016       | 
+| FS  | 000016             | 
+| NM  | Customer 2 Bulan 4 | 
 
 ### Payment Response
 
@@ -746,54 +811,98 @@ ISO message: "0200B23A400108818080000000001000010A370000000000138983112707241600
 {
 "f125": "",
 "f41": "KOI ",
-"f32": "360003",
+"f32": "alto",
 "f100": "1234567",
 "f12": "142413",
-"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD8",
+"f120": "",
 "f11": "000004",
 "f13": "1128",
-"f57": "S018TAGIHAN KARTU HALOS140========================================S233NOMOR PELANGGAN : 081228812348S333NAMA : KAMSHORY ROYS431TAGIHAN : Rp 138.983S534PERIODE : November 2020S631JATUH TEMPO : 2020-12-01S700S840SIMPAN STRUK INI YAH, JANGAN SAMPE ILANG",
+"f57": "R021BILLER : PLN POSTPAIDR126IDPEL : 522030064594R232NAMA : Customer 2 Bulan 4R325BL/TH : SEP20,OKT20R421STAND METER : 100-330R500R622TOTAL TGHN : 2 BULANR730TARIF/DAYA : B1 /000001300 VAR834NO REFF : 0UAK73F968AFA20E3B24R900RA32RP TAG PLN : RP 300.000RB00RC32ADMIN BANK : RP 2.500RD32TOTAL BAYAR : RP 302.500RE00RF00RG30PERUSAHAAN LISTRIK NEGARA(PLN)RH29 MENYATAKAN STRUK INI SEBAGAIRI27 BUKTI PEMBAYARAN YANG SAH",
 "f49": "360",
 "f15": "1128",
 "f37": "000000000248",
-"f48": "AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY",
+"f48": "AC042500PI06054501CN12522030064594FR12000000000016FS06000016NM18Customer 2 Bulan 4",
 "f18": "6012",
-"f3": "370000",
+"f3": "800000",
 "f39": "00",
-"f4": "000000138983",
+"f4": "000000300000",
 "f7": "1127072416",
-"f127": "071234567"
+"f127": ""
 }
 ```
 
-ISO message: "0210B23A40010A818080000000001000010A37000000000013898311270724160000041424131128112860120636000300000000024800KOI             077AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY360296S018TAGIHAN KARTU HALOS140========================================S233NOMOR PELANGGAN    : 081228812348S333NAMA               : KAMSHORY ROYS431TAGIHAN            : Rp 138.983S534PERIODE            : November 2020S631JATUH TEMPO        : 2020-12-01S700S840SIMPAN STRUK INI YAH, JANGAN SAMPE ILANG071234567123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD800009071234567"
+ISO message: "0210B23A40010A818080000000001000010A800000000000300000112707241600000414241311281128601204alto00000000024800KOI             082AC042500PI06054501CN12522030064594FR12000000000016FS06000016NM18Customer 2 Bulan 4360469R021BILLER : PLN POSTPAIDR126IDPEL       : 522030064594R232NAMA        : Customer 2 Bulan 4R325BL/TH       : SEP20,OKT20R421STAND METER : 100-330R500R622TOTAL TGHN  :  2 BULANR730TARIF/DAYA  : B1 /000001300 VAR834NO REFF     : 0UAK73F968AFA20E3B24R900RA32RP TAG PLN  : RP         300.000RB00RC32ADMIN BANK  : RP           2.500RD32TOTAL BAYAR : RP         302.500RE00RF00RG30PERUSAHAAN LISTRIK NEGARA(PLN)RH29 MENYATAKAN STRUK INI SEBAGAIRI27  BUKTI PEMBAYARAN YANG SAH07123456709071234567000"
+
+**TLV Data on Field 48 Response**
+| TAG | VALUE              | 
+| --- | ------------------ | 
+| AC  | 2500               | 
+| PI  | 054501             | 
+| CN  | 522030064594       | 
+| FR  | 000000000016       | 
+| FS  | 000016             | 
+| NM  | Customer 2 Bulan 4 | 
+
+**TLV Data on Field 57 Response**
+| TAG | VALUE                              | 
+| --- | ---------------------------------- | 
+| R0  | BILLER : PLN POSTPAID              | 
+| R1  | IDPEL       : 522030064594         | 
+| R2  | NAMA        : Customer 2 Bulan 4   | 
+| R3  | BL/TH       : SEP20,OKT20          | 
+| R4  | STAND METER : 100-330              | 
+| R5  |                                    | 
+| R6  | TOTAL TGHN  :  2 BULAN             | 
+| R7  | TARIF/DAYA  : B1 /000001300 VA     | 
+| R8  | NO REFF     : 0UAK73F968AFA20E3B24 | 
+| R9  |                                    | 
+| RA  | RP TAG PLN  : RP         300.000   | 
+| RB  |                                    | 
+| RC  | ADMIN BANK  : RP           2.500   | 
+| RD  | TOTAL BAYAR : RP         302.500   | 
+| RE  |                                    | 
+| RF  |                                    | 
+| RG  | PERUSAHAAN LISTRIK NEGARA(PLN)     | 
+| RH  |  MENYATAKAN STRUK INI SEBAGAI      | 
+| RI  |   BUKTI PEMBAYARAN YANG SAH        | 
+
 
 ### Advice Request
 
 ```json
 {
-"f125": "",
+"f125": "071234567",
 "f41": "KOI ",
-"f32": "360003",
+"f32": "alto",
 "f100": "1234567",
 "f12": "142413",
-"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD8",
 "f11": "000004",
 "f13": "1128",
 "f57": "",
 "f49": "360",
 "f15": "1128",
 "f37": "000000000248",
-"f48": "AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY",
+"f48": "AC042500PI06054501CN12522030064594FR12000000000016FS06000016NM18Customer 2 Bulan 4",
 "f18": "6012",
-"f3": "370000",
-"f4": "000000138983",
+"f3": "800000",
+"f4": "000000300000",
 "f7": "1127072416",
-"f127": "071234567"
+"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzI2MzMxfQ.zuX4w0HSPVrJS7zLZMETsjQr1a7J1YGbdVZDECrPieE",
+"f127": ""
 }
 ```
 
-ISO message: "0220B23A400108818080000000001000010A370000000000138983112707241600000414241311281128601206360003000000000248KOI             077AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY360000071234567123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD800009071234567"
+ISO message: "0220B23A400108818080000000001000010A800000000000300000112707241600000414241311281128601204alto000000000248KOI             082AC042500PI06054501CN12522030064594FR12000000000016FS06000016NM18Customer 2 Bulan 4360000071234567123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NzI2MzMxfQ.zuX4w0HSPVrJS7zLZMETsjQr1a7J1YGbdVZDECrPieE09071234567000"
+
+**TLV Data on Field 48 Request **
+| TAG | VALUE              | 
+| --- | ------------------ | 
+| AC  | 2500               | 
+| PI  | 054501             | 
+| CN  | 522030064594       | 
+| FR  | 000000000016       | 
+| FS  | 000016             | 
+| NM  | Customer 2 Bulan 4 | 
 
 ### Advice Response
 
@@ -801,27 +910,60 @@ ISO message: "0220B23A400108818080000000001000010A370000000000138983112707241600
 {
 "f125": "",
 "f41": "KOI ",
-"f32": "360003",
+"f32": "alto",
 "f100": "1234567",
 "f12": "142413",
-"f120": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD8",
+"f120": "",
 "f11": "000004",
 "f13": "1128",
-"f57": "S018TAGIHAN KARTU HALOS140========================================S233NOMOR PELANGGAN : 081228812348S333NAMA : KAMSHORY ROYS431TAGIHAN : Rp 138.983S534PERIODE : November 2020S631JATUH TEMPO : 2020-12-01S700S840SIMPAN STRUK INI YAH, JANGAN SAMPE ILANG",
+"f57": "R021BILLER : PLN POSTPAIDR126IDPEL : 522030064594R232NAMA : Customer 2 Bulan 4R325BL/TH : SEP20,OKT20R421STAND METER : 100-330R500R622TOTAL TGHN : 2 BULANR730TARIF/DAYA : B1 /000001300 VAR834NO REFF : 0UAK73F968AFA20E3B24R900RA32RP TAG PLN : RP 300.000RB00RC32ADMIN BANK : RP 2.500RD32TOTAL BAYAR : RP 302.500RE00RF00RG30PERUSAHAAN LISTRIK NEGARA(PLN)RH29 MENYATAKAN STRUK INI SEBAGAIRI27 BUKTI PEMBAYARAN YANG SAH",
 "f49": "360",
 "f15": "1128",
 "f37": "000000000248",
-"f48": "AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY",
+"f48": "AC042500PI06054501CN12522030064594FR12000000000016FS06000016NM18Customer 2 Bulan 4",
 "f18": "6012",
-"f3": "370000",
+"f3": "800000",
 "f39": "00",
-"f4": "000000138983",
+"f4": "000000300000",
 "f7": "1127072416",
-"f127": "071234567"
+"f127": ""
 }
 ```
 
-ISO message: "0230B23A40010A818080000000001000010A37000000000013898311270724160000041424131128112860120636000300000000024800KOI             077AC042500PI06013026CN12081228812348FR1466479217091550FS0567279NM12KAMSHORY ROY360296S018TAGIHAN KARTU HALOS140========================================S233NOMOR PELANGGAN    : 081228812348S333NAMA               : KAMSHORY ROYS431TAGIHAN            : Rp 138.983S534PERIODE            : November 2020S631JATUH TEMPO        : 2020-12-01S700S840SIMPAN STRUK INI YAH, JANGAN SAMPE ILANG071234567123eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBTFRPIiwiZXhwIjoxNjA2NjIyNjg1fQ.-QVFeBEbSB4woOrTw3qY8PIi5G67iUZdTrWyKU7tGD800009071234567"
+ISO message: "0230B23A40010A818080000000001000010A800000000000300000112707241600000414241311281128601204alto00000000024800KOI             082AC042500PI06054501CN12522030064594FR12000000000016FS06000016NM18Customer 2 Bulan 4360469R021BILLER : PLN POSTPAIDR126IDPEL       : 522030064594R232NAMA        : Customer 2 Bulan 4R325BL/TH       : SEP20,OKT20R421STAND METER : 100-330R500R622TOTAL TGHN  :  2 BULANR730TARIF/DAYA  : B1 /000001300 VAR834NO REFF     : 0UAK73F968AFA20E3B24R900RA32RP TAG PLN  : RP         300.000RB00RC32ADMIN BANK  : RP           2.500RD32TOTAL BAYAR : RP         302.500RE00RF00RG30PERUSAHAAN LISTRIK NEGARA(PLN)RH29 MENYATAKAN STRUK INI SEBAGAIRI27  BUKTI PEMBAYARAN YANG SAH07123456709071234567000"
+
+**TLV Data on Field 48 Response**
+| TAG | VALUE              | 
+| --- | ------------------ | 
+| AC  | 2500               | 
+| PI  | 054501             | 
+| CN  | 522030064594       | 
+| FR  | 000000000016       | 
+| FS  | 000016             | 
+| NM  | Customer 2 Bulan 4 | 
+
+**TLV Data on Field 57 Response**
+| TAG | VALUE                              | 
+| --- | ---------------------------------- | 
+| R0  | BILLER : PLN POSTPAID              | 
+| R1  | IDPEL       : 522030064594         | 
+| R2  | NAMA        : Customer 2 Bulan 4   | 
+| R3  | BL/TH       : SEP20,OKT20          | 
+| R4  | STAND METER : 100-330              | 
+| R5  |                                    | 
+| R6  | TOTAL TGHN  :  2 BULAN             | 
+| R7  | TARIF/DAYA  : B1 /000001300 VA     | 
+| R8  | NO REFF     : 0UAK73F968AFA20E3B24 | 
+| R9  |                                    | 
+| RA  | RP TAG PLN  : RP         300.000   | 
+| RB  |                                    | 
+| RC  | ADMIN BANK  : RP           2.500   | 
+| RD  | TOTAL BAYAR : RP         302.500   | 
+| RE  |                                    | 
+| RF  |                                    | 
+| RG  | PERUSAHAAN LISTRIK NEGARA(PLN)     | 
+| RH  |  MENYATAKAN STRUK INI SEBAGAI      | 
+| RI  |   BUKTI PEMBAYARAN YANG SAH        | 
 
 # Product Message Specification
 
@@ -972,6 +1114,29 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 | RI  | 50  |         |         |         | M       | Payment receipt |
 
 Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
+
+## Postpaid Airtime
+
+**Field 48 Inquiry and Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
+|-----|-----|---------|---------|---------|---------|------------------------------------|
+| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
+| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
+| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
+| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
+| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
+| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+
+## Prepaid Airtime
+
+**Field 48 Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
+|-----|-----|---------|---------|---------|---------|------------------------------------|
+| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
+| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
+| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
+| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
+| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
 
 # Appendix
 
