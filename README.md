@@ -179,7 +179,7 @@ public static long getLength(byte[] header, boolean byteOrder)
 }
 ```
 
-# ISO 8385 Data Element
+# ISO 8583 Data Element
 
 | DE | Name | Type | Remark | 0200 | 0210 | 0220 | 0230 |
 |---|---|---|---|---|---|---|---|
@@ -1127,16 +1127,195 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 | FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
 | FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
 
+Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
+
 ## Prepaid Airtime
 
 **Field 48 Payment**
 | Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
 |-----|-----|---------|---------|---------|---------|------------------------------------|
+| PI  | 6   |         |         | M       | ME      | Product ID                         |
+| CN  | 24  |         |         | M       | ME      | Contract number or customer number |
+| AT  | 12  |         |         |         | M       | Total amount without point decimal |
+| FR  | 24  |         |         |         | M       | Forwarding reference number        |
+| FS  | 24  |         |         |         | M       | Forwarding STAN                    |
+
+Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
+
+**Field 48 Payment Request Example**
+| TAG | VALUE               | 
+| --- | ------------------- | 
+| PI  | 050001              | 
+| CN  | 081277777777        | 
+
+**Field 48 Payment Response Example**
+| TAG | VALUE               | 
+| --- | ------------------- | 
+| PI  | 050001              | 
+| CN  | 081277777777        | 
+| FR  | 8988757309534470    | 
+| FS  | 000002              | 
+
+## Mobile Data
+
+**Field 48 Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
+|-----|-----|---------|---------|---------|---------|------------------------------------|
+| PI  | 6   |         |         | M       | ME      | Product ID                         |
+| CN  | 24  |         |         | M       | ME      | Contract number or customer number |
+| AT  | 12  |         |         |         | M       | Total amount without point decimal |
+| FR  | 24  |         |         |         | M       | Forwarding reference number        |
+| FS  | 24  |         |         |         | M       | Forwarding STAN                    |
+
+Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
+
+**Field 48 Payment Request Example**
+| TAG | VALUE               | 
+| --- | ------------------- | 
+| PI  | 050001              | 
+| CN  | 081277777777        | 
+
+**Field 48 Payment Response Example**
+| TAG | VALUE               | 
+| --- | ------------------- | 
+| PI  | 050001              | 
+| CN  | 081277777777        | 
+| FR  | 8988757309534470    | 
+| FS  | 000002              | 
+
+## Top Up E-Money
+
+**Field 48 Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
+|-----|-----|---------|---------|---------|---------|------------------------------------|
+| PI  | 6   |         |         | M       | ME      | Product ID                         |
+| CN  | 24  |         |         | M       | ME      | Contract number or customer number |
+| AT  | 12  |         |         |         | M       | Total amount without point decimal |
+| FR  | 24  |         |         |         | M       | Forwarding reference number        |
+| FS  | 24  |         |         |         | M       | Forwarding STAN                    |
+
+**Field 48 Payment Request Example**
+| TAG | VALUE               | 
+| --- | ------------------- | 
+| PI  | 050001              | 
+| CN  | 081277777777        | 
+
+**Field 48 Payment Response Example**
+| TAG | VALUE               | 
+| --- | ------------------- | 
+| PI  | 050001              | 
+| CN  | 081277777777        | 
+| FR  | 8988757309534470    | 
+| FS  | 000002              | 
+
+Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
+
+## PBB (Pajak Bumi dan Bangunan)
+
+**Field 48 Inquiry and Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
+|-----|-----|---------|---------|---------|---------|------------------------------------|
 | PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
 | CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
+| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
 | AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
+| AC  | 12  | M       | ME      | ME      | ME      | Total admin fee                    |
 | FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
 | FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+
+**Field 57 Inquiry and Payment**
+| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
+|-----|-----|---------|---------|---------|---------|-----------------|
+| S0  | 50  |         | M       |         |         | Inquiry screen  |
+| S1  | 50  |         | M       |         |         | Inquiry screen  |
+| S2  | 50  |         | M       |         |         | Inquiry screen  |
+| S3  | 50  |         | M       |         |         | Inquiry screen  |
+| S4  | 50  |         | M       |         |         | Inquiry screen  |
+| S5  | 50  |         | M       |         |         | Inquiry screen  |
+| S6  | 50  |         | M       |         |         | Inquiry screen  |
+| S7  | 50  |         | M       |         |         | Inquiry screen  |
+| S8  | 50  |         | M       |         |         | Inquiry screen  |
+| S9  | 50  |         | M       |         |         | Inquiry screen  |
+| SA  | 50  |         | M       |         |         | Inquiry screen  |
+| R0  | 50  |         |         |         | M       | Payment receipt |
+| R1  | 50  |         |         |         | M       | Payment receipt |
+| R2  | 50  |         |         |         | M       | Payment receipt |
+| R3  | 50  |         |         |         | M       | Payment receipt |
+| R4  | 50  |         |         |         | M       | Payment receipt |
+| R5  | 50  |         |         |         | M       | Payment receipt |
+| R6  | 50  |         |         |         | M       | Payment receipt |
+| R7  | 50  |         |         |         | M       | Payment receipt |
+| R8  | 50  |         |         |         | M       | Payment receipt |
+| R9  | 50  |         |         |         | M       | Payment receipt |
+
+Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
+
+**Field 48 Inquiry Request Example**
+| TAG | VALUE            | 
+| --- | ---------------- | 
+| AC  | 2500             | 
+| PI  | 050001           | 
+| CN  | 0110017600183432 | 
+
+**Field 48 Inquiry Response Example**
+| TAG | VALUE               | 
+| --- | ------------------- | 
+| AC  | 2500                | 
+| PI  | 050001              | 
+| CN  | 0110017600183432    | 
+| FR  | 8988757309534470    | 
+| FS  | 000001              | 
+| NM  | WISHNU EKA SIDHARTA | 
+
+**Field 57 Inquiry Response Example**
+| TAG | VALUE                                 | 
+| --- | ------------------------------------- | 
+| S0  | NAME            : WISHNU EKA SIDHARTA | 
+| S1  | CUSTOMER ID     : 0110017600183432    | 
+| S2  | OPERATOR        : PBB Jakarta         | 
+| S3  | SUBDISTRICT     : Poncokusumo         | 
+| S4  | VILLAGE         : Gondokusuman        | 
+| S5  | PAYMENT PERIOD  :                     | 
+| S6  | SURFACE AREA    : 1519 m2             | 
+| S7  | BUILDING AREA   : 119 m2              | 
+| S8  | BILL AMOUNT     : 190000              | 
+| S9  | DUE DATE        : 1231-01-01          | 
+| SA  | NJOP BUMI/ M2   : 10000000            | 
+
+
+**Field 48 Payment Request Example**
+| TAG | VALUE               | 
+| --- | ------------------- | 
+| AC  | 2500                | 
+| PI  | 050001              | 
+| CN  | 0110017600183432    | 
+| FR  | 8988757309534470    | 
+| FS  | 000002              | 
+| NM  | WISHNU EKA SIDHARTA | 
+
+**Field 48 Payment Response Example**
+| TAG | VALUE               | 
+| --- | ------------------- | 
+| AC  | 2500                | 
+| PI  | 050001              | 
+| CN  | 0110017600183432    | 
+| FR  | 8988757309534470    | 
+| FS  | 000002              | 
+| NM  | WISHNU EKA SIDHARTA | 
+
+**Field 57 Payment Response Example**
+| TAG | VALUE                                 | 
+| --- | ------------------------------------- | 
+| R0  | NAME            : WISHNU EKA SIDHARTA | 
+| R1  | CUSTOMER ID     : 0110017600183432    | 
+| R2  | OPERATOR        : PBB Jakarta         | 
+| R3  | SUBDISTRICT     : Poncokusumo         | 
+| R4  | VILLAGE         : Gondokusuman        | 
+| R5  | PAYMENT PERIOD  : 2018                | 
+| R6  | SURFACE AREA    : 1519 m2             | 
+| R7  | BUILDING AREA   : 119 m2              | 
+| R8  | BILL AMOUNT     : 190000              | 
+| R9  | NJOP BUMI/ M2   : 10000000            | 
 
 # Appendix
 
