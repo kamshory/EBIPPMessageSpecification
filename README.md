@@ -1019,6 +1019,80 @@ In this session, we will only discuss field  48 and field  57 of ISO 8583. Other
 
 Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
 
+**Field 48 Inquiry Request Example**
+| TAG | VALUE        | 
+| --- | ------------ | 
+| AC  | 2500         | 
+| PI  | 054501       | 
+| CN  | 522030064594 | 
+
+**Field 48 Inquiry Response Example**
+| TAG | VALUE              | 
+| --- | ------------------ | 
+| AC  | 2500               | 
+| PI  | 054501             | 
+| CN  | 522030064594       | 
+| FR  | 000000000001       | 
+| FS  | 000001             | 
+| NM  | Customer 2 Bulan 4 | 
+
+**Field 57 Inquiry Response Example**
+| TAG | VALUE                            | 
+| --- | -------------------------------- | 
+| S0  | INFORMASI TAGIHAN LISTRIK        | 
+| S1  |                                  | 
+| S2  | BILLER : PLN PREPAID             | 
+| S3  | IDPEL       : 522030064594       | 
+| S4  | NAMA        : Customer 2 Bulan 4 | 
+| S5  | BL/TH       : SEP20,OKT20        | 
+| S6  | TOTAL TGHN  :  2 BULAN           | 
+| S7  | RP TAG PLN  : RP         690.000 | 
+| S8  | ADMIN BANK  : RP           2.500 | 
+| S9  | TOTAL BAYAR : RP         692.500 | 
+
+**Field 48 Payment Request Example**
+| TAG | VALUE              | 
+| --- | ------------------ | 
+| AC  | 2500               | 
+| PI  | 054501             | 
+| CN  | 522030064594       | 
+| FR  | 000000000016       | 
+| FS  | 000016             | 
+| NM  | Customer 2 Bulan 4 | 
+
+**Field 48 Payment Response Example**
+| TAG | VALUE              | 
+| --- | ------------------ | 
+| AC  | 2500               | 
+| PI  | 054501             | 
+| CN  | 522030064594       | 
+| FR  | 000000000016       | 
+| FS  | 000016             | 
+| NM  | Customer 2 Bulan 4 | 
+
+**Field 57 Payment Response Example**
+| TAG | VALUE                              | 
+| --- | ---------------------------------- | 
+| R0  | BILLER : PLN POSTPAID              | 
+| R1  | IDPEL       : 522030064594         | 
+| R2  | NAMA        : Customer 2 Bulan 4   | 
+| R3  | BL/TH       : SEP20,OKT20          | 
+| R4  | STAND METER : 100-330              | 
+| R5  |                                    | 
+| R6  | TOTAL TGHN  :  2 BULAN             | 
+| R7  | TARIF/DAYA  : B1 /000001300 VA     | 
+| R8  | NO REFF     : 0UAK73F968AFA20E3B24 | 
+| R9  |                                    | 
+| RA  | RP TAG PLN  : RP         300.000   | 
+| RB  |                                    | 
+| RC  | ADMIN BANK  : RP           2.500   | 
+| RD  | TOTAL BAYAR : RP         302.500   | 
+| RE  |                                    | 
+| RF  |                                    | 
+| RG  | PERUSAHAAN LISTRIK NEGARA(PLN)     | 
+| RH  |  MENYATAKAN STRUK INI SEBAGAI      | 
+| RI  |   BUKTI PEMBAYARAN YANG SAH        | 
+
 ## Postpaid Electricity
 
 **Field 48 Inquiry and Payment**
