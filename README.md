@@ -1,6 +1,3 @@
-
-
-
 # Topology
 
 The following is sequence diagram for inquiry process
@@ -591,95 +588,149 @@ ISO Message = "081082200001020100000400000000000100112707241600000405CA12300116A
 
 The following is a list of data elements
 
-| DE   | Type and Length    | Description                                  |
-| ---- | ------------------ | -------------------------------------------- |
-| 3    | N 6                | Processing Code                              |
-| 4    | N 12               | Amount                                       |
-| 7    | N 10               | Date and Time in GMT                         |
-| 11   | N 6                | System Trace Audit Number                    |
-| 12   | N 6                | Local Transaction Time                       |
-| 13   | N 4                | Local Transaction Date                       |
-| 15   | N 4                | Settlement Date                              |
-| 18   | N 4                | Channel Type                                 |
-| 32   | AN .. 11 LLVAR     | Acquiring Institution ID (Client Code)       |
-| 37   | AN 12              | Transaction Reference Number                 |
-| 39   | N 2                | Response Code                                |
-| 41   | AN 16              | Card Acceptor Terminal Identification        |
-| 48   | ANS ... 999 LLLVAR | Additional Data                              |
-| 49   | N 3                | Transaction Currency Code                    |
-| 57   | ANS ... 999 LLLVAR | Inquiry Screen and Payment Receipt           |
-| 100  | AN .. 11 LLVAR     | Receiving Institution Identification Code    |
-| 120  | AN ... 999 LLLVAR  | Last Key Sent by Server                      |
-| 125  | AN .. 255 LLLVAR   | Transaction Indicator                        |
-| 127  | AN .. 11 LLVAR     | Destination Institution Identification Code  |
+| DE   | Type and Length    | 200 I | 210 I | 200 P | 210 P | Description                                  |
+| ---- | ------------------ |-------|-------|-------|-------| -------------------------------------------- |
+| 3    | N 6                | M     | ME    | ME    | ME    | Processing Code                              |
+| 4    | N 12               |       | M     | ME    | ME    | Amount                                       |
+| 7    | N 10               | M     | ME    | ME    | ME    | Date and Time in GMT                         |
+| 11   | N 6                | M     | ME    | ME    | ME    | System Trace Audit Number                    |
+| 12   | N 6                | M     | ME    | ME    | ME    | Local Transaction Time                       |
+| 13   | N 4                | M     | ME    | ME    | ME    | Local Transaction Date                       |
+| 15   | N 4                | M     | ME    | ME    | ME    | Settlement Date                              |
+| 18   | N 4                | M     | ME    | ME    | ME    | Channel Type                                 |
+| 32   | AN .. 11 LLVAR     | M     | ME    | ME    | ME    | Acquiring Institution ID (Client Code)       |
+| 37   | AN 12              | M     | ME    | ME    | ME    | Transaction Reference Number                 |
+| 39   | N 2                |       | M     | M     | ME    | Response Code                                |
+| 41   | AN 16              | M     | ME    | ME    | ME    | Card Acceptor Terminal Identification        |
+| 48   | ANS ... 999 LLLVAR | M     | ME    | ME    | ME    | Additional Data                              |
+| 49   | N 3                | M     | ME    | ME    | ME    | Transaction Currency Code                    |
+| 57   | ANS ... 999 LLLVAR |       | M     |       | M     | Inquiry Screen and Payment Receipt           |
+| 100  | AN .. 11 LLVAR     | M     | ME    | ME    | ME    | Receiving Institution Identification Code    |
+| 120  | AN ... 999 LLLVAR  | M     |       | M     |       | Last Key Sent by Server                      |
+| 125  | AN .. 255 LLLVAR   | M     | ME    | ME    | ME    | Transaction Indicator                        |
+| 127  | AN .. 11 LLVAR     | M     | ME    | ME    | ME    | Destination Institution Identification Code  |
 
 Note:
 
 1. Field 32, 100, 125 and 127 will be informed
 2. Field 48 and 57 are TLV
 3. Field 39 only exists on response
+4. Field 57 only exists on response
+5. Field 120 only exists on request
+
+### Field 3
+
+Field 3 is Processing Code. See Appendix section.
+
+### Field 4 
+
+Field 4 is transaction amount. Transaction sent by server on inquiry response. Some product which does not have inquiry, amount sent by client on payment request or by server on payment response.
+
+### Field 7 
+
+Field 4 is Date and Time in GMT with format MMddHHmmss (on Java). For example, 27 December 2020 13:56:29 written `1227135629`.
+
+### Field 11
+
+Field 11 is System Trace Audit Number 6 digit with left padding.
+
+### Field 12
+
+Field 12 is Local Transaction Time with format HHmmss (on Java). For example, 27 December 2020 20:56:29 written `205629`. 
+
+### Field 13
+
+Field 12 is Local Transaction Date with format MMdd (on Java). For example, 27 December 2020 written `1227`. 
+
+### Field 15
+
+Field 12 is Settlement Date with format MMdd (on Java). For example, 28 December 2020 written `1228`. 
+
+### Field 18
+
+Field 18 is Channel Type. See Appendix section.
 
 ### Field 32 
 
 Field 32 is filled by `Client Code`. Client code is generated by AltoPay Biller and will be informed to client.
 
+### Field 37 
+
+Field 37 is Transaction Reference Number. Use unix reference both in inquiry and payment. For advice, use reference number same with payment.
+
+### Field 39
+
+Field 39 is Response Code. See Appendix section.
+
+### Field 41
+
+Field 41 is Card Acceptor Terminal Identification.
+
 ### Field 48 
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
-|-----|-----|---------|---------|---------|---------|------------------------------------|
-| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
-| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
-| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
-| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
-| AC  | 12  | C       | CE      | CE      | CE      | Total admin fee                    |
-| C1  | 24  | C       | CE      | CE      | CE      | Customer reference 1               |
-| C2  | 24  | C       | CE      | CE      | CE      | Customer reference 2               |
-| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
-| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description                        |
+|-----|-----|-------|-------|-------|-------|------------------------------------|
+| PI  | 6   | M     | ME    | ME    | ME    | Product ID                         |
+| CN  | 24  | M     | ME    | ME    | ME    | Contract number or customer number |
+| NM  | 50  |       | M     | ME    | ME    | Customer name                      |
+| AT  | 12  |       | M     | ME    | ME    | Total amount without point decimal |
+| AC  | 12  | C     | CE    | CE    | CE    | Total admin fee                    |
+| C1  | 24  | C     | CE    | CE    | CE    | Customer reference 1               |
+| C2  | 24  | C     | CE    | CE    | CE    | Customer reference 2               |
+| FR  | 24  |       | M     | ME    | ME    | Forwarding reference number        |
+| FS  | 24  |       | M     | ME    | ME    | Forwarding STAN                    |
+
+### Field 49
+
+Field 49 is Transaction Currency Code according ISO 4217 in 3 digit number.
 
 ### Field 57 
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
-|-----|-----|---------|---------|---------|---------|-----------------|
-| S0  | 50  |         | M       |         |         | Inquiry screen  |
-| S1  | 50  |         | M       |         |         | Inquiry screen  |
-| S2  | 50  |         | M       |         |         | Inquiry screen  |
-| S3  | 50  |         | M       |         |         | Inquiry screen  |
-| S4  | 50  |         | M       |         |         | Inquiry screen  |
-| S5  | 50  |         | M       |         |         | Inquiry screen  |
-| S6  | 50  |         | M       |         |         | Inquiry screen  |
-| S7  | 50  |         | M       |         |         | Inquiry screen  |
-| S8  | 50  |         | M       |         |         | Inquiry screen  |
-| S9  | 50  |         | M       |         |         | Inquiry screen  |
-| R0  | 50  |         |         |         | M       | Payment receipt |
-| R1  | 50  |         |         |         | M       | Payment receipt |
-| R2  | 50  |         |         |         | M       | Payment receipt |
-| R3  | 50  |         |         |         | M       | Payment receipt |
-| R4  | 50  |         |         |         | M       | Payment receipt |
-| R5  | 50  |         |         |         | M       | Payment receipt |
-| R6  | 50  |         |         |         | M       | Payment receipt |
-| R7  | 50  |         |         |         | M       | Payment receipt |
-| R8  | 50  |         |         |         | M       | Payment receipt |
-| R9  | 50  |         |         |         | M       | Payment receipt |
-| RA  | 50  |         |         |         | M       | Payment receipt |
-| RB  | 50  |         |         |         | M       | Payment receipt |
-| RC  | 50  |         |         |         | M       | Payment receipt |
-| RD  | 50  |         |         |         | M       | Payment receipt |
-| RE  | 50  |         |         |         | M       | Payment receipt |
-| RF  | 50  |         |         |         | M       | Payment receipt |
-| RG  | 50  |         |         |         | M       | Payment receipt |
-| RH  | 50  |         |         |         | M       | Payment receipt |
-| RI  | 50  |         |         |         | M       | Payment receipt |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description     |
+|-----|-----|-------|-------|-------|-------|-----------------|
+| S0  | 50  |       | M     |       |       | Inquiry screen  |
+| S1  | 50  |       | M     |       |       | Inquiry screen  |
+| S2  | 50  |       | M     |       |       | Inquiry screen  |
+| S3  | 50  |       | M     |       |       | Inquiry screen  |
+| S4  | 50  |       | M     |       |       | Inquiry screen  |
+| S5  | 50  |       | M     |       |       | Inquiry screen  |
+| S6  | 50  |       | M     |       |       | Inquiry screen  |
+| S7  | 50  |       | M     |       |       | Inquiry screen  |
+| S8  | 50  |       | M     |       |       | Inquiry screen  |
+| S9  | 50  |       | M     |       |       | Inquiry screen  |
+| R0  | 50  |       |       |       | M     | Payment receipt |
+| R1  | 50  |       |       |       | M     | Payment receipt |
+| R2  | 50  |       |       |       | M     | Payment receipt |
+| R3  | 50  |       |       |       | M     | Payment receipt |
+| R4  | 50  |       |       |       | M     | Payment receipt |
+| R5  | 50  |       |       |       | M     | Payment receipt |
+| R6  | 50  |       |       |       | M     | Payment receipt |
+| R7  | 50  |       |       |       | M     | Payment receipt |
+| R8  | 50  |       |       |       | M     | Payment receipt |
+| R9  | 50  |       |       |       | M     | Payment receipt |
+| RA  | 50  |       |       |       | M     | Payment receipt |
+| RB  | 50  |       |       |       | M     | Payment receipt |
+| RC  | 50  |       |       |       | M     | Payment receipt |
+| RD  | 50  |       |       |       | M     | Payment receipt |
+| RE  | 50  |       |       |       | M     | Payment receipt |
+| RF  | 50  |       |       |       | M     | Payment receipt |
+| RG  | 50  |       |       |       | M     | Payment receipt |
+| RH  | 50  |       |       |       | M     | Payment receipt |
+| RI  | 50  |       |       |       | M     | Payment receipt |
 
 ### Field 100
 
 Field 32 is filled by `Receiving Institution Code`. Receiving institution code will be informed to client.
 
+### Field 120
+
+Field 120 is key management. This value must be same with last key (field 120 on 0800 or 0810 message) sent by server. If client receive response code **Transaction Not Permit (58)**, client must send key exchange request to get new key.
+
 ### Field 125
 
-Field 125 us transaction indicator. Transaction indicator format will be informed to client.
+Field 125 is transaction indicator. Transaction indicator format will be informed to client.
 
 ### Field 127
 
-Field 32 is filled by `Destination Code`. Destination code will be informed to client.
+Field 127 is filled by `Destination Code`. Destination code will be informed to client.
 
 ## Sample Message
 
@@ -967,55 +1018,55 @@ ISO message: "0230B23A40010A818080000000001000010A800000000000300000112707241600
 
 # Product Message Specification
 
-In this session, we will only discuss field  48 and field  57 of ISO 8583. Other field s are adjusted according to the specifications we discussed in the Transaction Message Format section.
+In this session, we will only discuss field  48 and field  57 of ISO 8583. Other fields are adjusted according to the specifications we discussed in the Transaction Message Format section. Some products do not have field 57. Billing information is available in field 48.
 
 ## Prepaid Electricity
 
 **Field 48 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
-|-----|-----|---------|---------|---------|---------|------------------------------------|
-| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
-| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
-| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
-| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
-| AC  | 12  | M       | ME      | ME      | ME      | Total admin fee                    |
-| C1  | 24  | C       | CE      | CE      | CE      | Customer reference 1               |
-| C2  | 24  | C       | CE      | CE      | CE      | Customer reference 2               |
-| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
-| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description                        |
+|-----|-----|-------|-------|-------|-------|------------------------------------|
+| PI  | 6   | M     | ME    | ME    | ME    | Product ID                         |
+| CN  | 24  | M     | ME    | ME    | ME    | Contract number or customer number |
+| NM  | 50  |       | M     | ME    | ME    | Customer name                      |
+| AT  | 12  |       | M     | ME    | ME    | Total amount without point decimal |
+| AC  | 12  | M     | ME    | ME    | ME    | Total admin fee                    |
+| C1  | 24  | C     | CE    | CE    | CE    | Customer reference 1               |
+| C2  | 24  | C     | CE    | CE    | CE    | Customer reference 2               |
+| FR  | 24  |       | M     | ME    | ME    | Forwarding reference number        |
+| FS  | 24  |       | M     | ME    | ME    | Forwarding STAN                    |
 
 **Field 57 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
-|-----|-----|---------|---------|---------|---------|-----------------|
-| S0  | 50  |         | M       |         |         | Inquiry screen  |
-| S1  | 50  |         | M       |         |         | Inquiry screen  |
-| S2  | 50  |         | M       |         |         | Inquiry screen  |
-| S3  | 50  |         | M       |         |         | Inquiry screen  |
-| S4  | 50  |         | M       |         |         | Inquiry screen  |
-| S5  | 50  |         | M       |         |         | Inquiry screen  |
-| S6  | 50  |         | M       |         |         | Inquiry screen  |
-| S7  | 50  |         | M       |         |         | Inquiry screen  |
-| S8  | 50  |         | M       |         |         | Inquiry screen  |
-| S9  | 50  |         | M       |         |         | Inquiry screen  |
-| R0  | 50  |         |         |         | M       | Payment receipt |
-| R1  | 50  |         |         |         | M       | Payment receipt |
-| R2  | 50  |         |         |         | M       | Payment receipt |
-| R3  | 50  |         |         |         | M       | Payment receipt |
-| R4  | 50  |         |         |         | M       | Payment receipt |
-| R5  | 50  |         |         |         | M       | Payment receipt |
-| R6  | 50  |         |         |         | M       | Payment receipt |
-| R7  | 50  |         |         |         | M       | Payment receipt |
-| R8  | 50  |         |         |         | M       | Payment receipt |
-| R9  | 50  |         |         |         | M       | Payment receipt |
-| RA  | 50  |         |         |         | M       | Payment receipt |
-| RB  | 50  |         |         |         | M       | Payment receipt |
-| RC  | 50  |         |         |         | M       | Payment receipt |
-| RD  | 50  |         |         |         | M       | Payment receipt |
-| RE  | 50  |         |         |         | M       | Payment receipt |
-| RF  | 50  |         |         |         | M       | Payment receipt |
-| RG  | 50  |         |         |         | M       | Payment receipt |
-| RH  | 50  |         |         |         | M       | Payment receipt |
-| RI  | 50  |         |         |         | M       | Payment receipt |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description     |
+|-----|-----|-------|-------|-------|-------|-----------------|
+| S0  | 50  |       | M     |       |       | Inquiry screen  |
+| S1  | 50  |       | M     |       |       | Inquiry screen  |
+| S2  | 50  |       | M     |       |       | Inquiry screen  |
+| S3  | 50  |       | M     |       |       | Inquiry screen  |
+| S4  | 50  |       | M     |       |       | Inquiry screen  |
+| S5  | 50  |       | M     |       |       | Inquiry screen  |
+| S6  | 50  |       | M     |       |       | Inquiry screen  |
+| S7  | 50  |       | M     |       |       | Inquiry screen  |
+| S8  | 50  |       | M     |       |       | Inquiry screen  |
+| S9  | 50  |       | M     |       |       | Inquiry screen  |
+| R0  | 50  |       |       |       | M     | Payment receipt |
+| R1  | 50  |       |       |       | M     | Payment receipt |
+| R2  | 50  |       |       |       | M     | Payment receipt |
+| R3  | 50  |       |       |       | M     | Payment receipt |
+| R4  | 50  |       |       |       | M     | Payment receipt |
+| R5  | 50  |       |       |       | M     | Payment receipt |
+| R6  | 50  |       |       |       | M     | Payment receipt |
+| R7  | 50  |       |       |       | M     | Payment receipt |
+| R8  | 50  |       |       |       | M     | Payment receipt |
+| R9  | 50  |       |       |       | M     | Payment receipt |
+| RA  | 50  |       |       |       | M     | Payment receipt |
+| RB  | 50  |       |       |       | M     | Payment receipt |
+| RC  | 50  |       |       |       | M     | Payment receipt |
+| RD  | 50  |       |       |       | M     | Payment receipt |
+| RE  | 50  |       |       |       | M     | Payment receipt |
+| RF  | 50  |       |       |       | M     | Payment receipt |
+| RG  | 50  |       |       |       | M     | Payment receipt |
+| RH  | 50  |       |       |       | M     | Payment receipt |
+| RI  | 50  |       |       |       | M     | Payment receipt |
 
 Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
 
@@ -1096,123 +1147,123 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 ## Postpaid Electricity
 
 **Field 48 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
-|-----|-----|---------|---------|---------|---------|------------------------------------|
-| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
-| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
-| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
-| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
-| AC  | 12  | M       | ME      | ME      | ME      | Total admin fee                    |
-| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
-| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description                        |
+|-----|-----|-------|-------|-------|-------|------------------------------------|
+| PI  | 6   | M     | ME    | ME    | ME    | Product ID                         |
+| CN  | 24  | M     | ME    | ME    | ME    | Contract number or customer number |
+| NM  | 50  |       | M     | ME    | ME    | Customer name                      |
+| AT  | 12  |       | M     | ME    | ME    | Total amount without point decimal |
+| AC  | 12  | M     | ME    | ME    | ME    | Total admin fee                    |
+| FR  | 24  |       | M     | ME    | ME    | Forwarding reference number        |
+| FS  | 24  |       | M     | ME    | ME    | Forwarding STAN                    |
 
 **Field 57 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
-|-----|-----|---------|---------|---------|---------|-----------------|
-| S0  | 50  |         | M       |         |         | Inquiry screen  |
-| S1  | 50  |         | M       |         |         | Inquiry screen  |
-| S2  | 50  |         | M       |         |         | Inquiry screen  |
-| S3  | 50  |         | M       |         |         | Inquiry screen  |
-| S4  | 50  |         | M       |         |         | Inquiry screen  |
-| S5  | 50  |         | M       |         |         | Inquiry screen  |
-| S6  | 50  |         | M       |         |         | Inquiry screen  |
-| S7  | 50  |         | M       |         |         | Inquiry screen  |
-| S8  | 50  |         | M       |         |         | Inquiry screen  |
-| S9  | 50  |         | M       |         |         | Inquiry screen  |
-| R0  | 50  |         |         |         | M       | Payment receipt |
-| R1  | 50  |         |         |         | M       | Payment receipt |
-| R2  | 50  |         |         |         | M       | Payment receipt |
-| R3  | 50  |         |         |         | M       | Payment receipt |
-| R4  | 50  |         |         |         | M       | Payment receipt |
-| R5  | 50  |         |         |         | M       | Payment receipt |
-| R6  | 50  |         |         |         | M       | Payment receipt |
-| R7  | 50  |         |         |         | M       | Payment receipt |
-| R8  | 50  |         |         |         | M       | Payment receipt |
-| R9  | 50  |         |         |         | M       | Payment receipt |
-| RA  | 50  |         |         |         | M       | Payment receipt |
-| RB  | 50  |         |         |         | M       | Payment receipt |
-| RC  | 50  |         |         |         | M       | Payment receipt |
-| RD  | 50  |         |         |         | M       | Payment receipt |
-| RE  | 50  |         |         |         | M       | Payment receipt |
-| RF  | 50  |         |         |         | M       | Payment receipt |
-| RG  | 50  |         |         |         | M       | Payment receipt |
-| RH  | 50  |         |         |         | M       | Payment receipt |
-| RI  | 50  |         |         |         | M       | Payment receipt |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description     |
+|-----|-----|-------|-------|-------|-------|-----------------|
+| S0  | 50  |       | M     |       |       | Inquiry screen  |
+| S1  | 50  |       | M     |       |       | Inquiry screen  |
+| S2  | 50  |       | M     |       |       | Inquiry screen  |
+| S3  | 50  |       | M     |       |       | Inquiry screen  |
+| S4  | 50  |       | M     |       |       | Inquiry screen  |
+| S5  | 50  |       | M     |       |       | Inquiry screen  |
+| S6  | 50  |       | M     |       |       | Inquiry screen  |
+| S7  | 50  |       | M     |       |       | Inquiry screen  |
+| S8  | 50  |       | M     |       |       | Inquiry screen  |
+| S9  | 50  |       | M     |       |       | Inquiry screen  |
+| R0  | 50  |       |       |       | M     | Payment receipt |
+| R1  | 50  |       |       |       | M     | Payment receipt |
+| R2  | 50  |       |       |       | M     | Payment receipt |
+| R3  | 50  |       |       |       | M     | Payment receipt |
+| R4  | 50  |       |       |       | M     | Payment receipt |
+| R5  | 50  |       |       |       | M     | Payment receipt |
+| R6  | 50  |       |       |       | M     | Payment receipt |
+| R7  | 50  |       |       |       | M     | Payment receipt |
+| R8  | 50  |       |       |       | M     | Payment receipt |
+| R9  | 50  |       |       |       | M     | Payment receipt |
+| RA  | 50  |       |       |       | M     | Payment receipt |
+| RB  | 50  |       |       |       | M     | Payment receipt |
+| RC  | 50  |       |       |       | M     | Payment receipt |
+| RD  | 50  |       |       |       | M     | Payment receipt |
+| RE  | 50  |       |       |       | M     | Payment receipt |
+| RF  | 50  |       |       |       | M     | Payment receipt |
+| RG  | 50  |       |       |       | M     | Payment receipt |
+| RH  | 50  |       |       |       | M     | Payment receipt |
+| RI  | 50  |       |       |       | M     | Payment receipt |
 
 Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
 
 ## Nontaglis Electricity
 
 **Field 48 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
-|-----|-----|---------|---------|---------|---------|------------------------------------|
-| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
-| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
-| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
-| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
-| AC  | 12  | M       | ME      | ME      | ME      | Total admin fee                    |
-| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
-| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description                        |
+|-----|-----|-------|-------|-------|-------|------------------------------------|
+| PI  | 6   | M     | ME    | ME    | ME    | Product ID                         |
+| CN  | 24  | M     | ME    | ME    | ME    | Contract number or customer number |
+| NM  | 50  |       | M     | ME    | ME    | Customer name                      |
+| AT  | 12  |       | M     | ME    | ME    | Total amount without point decimal |
+| AC  | 12  | M     | ME    | ME    | ME    | Total admin fee                    |
+| FR  | 24  |       | M     | ME    | ME    | Forwarding reference number        |
+| FS  | 24  |       | M     | ME    | ME    | Forwarding STAN                    |
 
 **Field 57 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
-|-----|-----|---------|---------|---------|---------|-----------------|
-| S0  | 50  |         | M       |         |         | Inquiry screen  |
-| S1  | 50  |         | M       |         |         | Inquiry screen  |
-| S2  | 50  |         | M       |         |         | Inquiry screen  |
-| S3  | 50  |         | M       |         |         | Inquiry screen  |
-| S4  | 50  |         | M       |         |         | Inquiry screen  |
-| S5  | 50  |         | M       |         |         | Inquiry screen  |
-| S6  | 50  |         | M       |         |         | Inquiry screen  |
-| S7  | 50  |         | M       |         |         | Inquiry screen  |
-| S8  | 50  |         | M       |         |         | Inquiry screen  |
-| S9  | 50  |         | M       |         |         | Inquiry screen  |
-| R0  | 50  |         |         |         | M       | Payment receipt |
-| R1  | 50  |         |         |         | M       | Payment receipt |
-| R2  | 50  |         |         |         | M       | Payment receipt |
-| R3  | 50  |         |         |         | M       | Payment receipt |
-| R4  | 50  |         |         |         | M       | Payment receipt |
-| R5  | 50  |         |         |         | M       | Payment receipt |
-| R6  | 50  |         |         |         | M       | Payment receipt |
-| R7  | 50  |         |         |         | M       | Payment receipt |
-| R8  | 50  |         |         |         | M       | Payment receipt |
-| R9  | 50  |         |         |         | M       | Payment receipt |
-| RA  | 50  |         |         |         | M       | Payment receipt |
-| RB  | 50  |         |         |         | M       | Payment receipt |
-| RC  | 50  |         |         |         | M       | Payment receipt |
-| RD  | 50  |         |         |         | M       | Payment receipt |
-| RE  | 50  |         |         |         | M       | Payment receipt |
-| RF  | 50  |         |         |         | M       | Payment receipt |
-| RG  | 50  |         |         |         | M       | Payment receipt |
-| RH  | 50  |         |         |         | M       | Payment receipt |
-| RI  | 50  |         |         |         | M       | Payment receipt |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description     |
+|-----|-----|-------|-------|-------|-------|-----------------|
+| S0  | 50  |       | M     |       |       | Inquiry screen  |
+| S1  | 50  |       | M     |       |       | Inquiry screen  |
+| S2  | 50  |       | M     |       |       | Inquiry screen  |
+| S3  | 50  |       | M     |       |       | Inquiry screen  |
+| S4  | 50  |       | M     |       |       | Inquiry screen  |
+| S5  | 50  |       | M     |       |       | Inquiry screen  |
+| S6  | 50  |       | M     |       |       | Inquiry screen  |
+| S7  | 50  |       | M     |       |       | Inquiry screen  |
+| S8  | 50  |       | M     |       |       | Inquiry screen  |
+| S9  | 50  |       | M     |       |       | Inquiry screen  |
+| R0  | 50  |       |       |       | M     | Payment receipt |
+| R1  | 50  |       |       |       | M     | Payment receipt |
+| R2  | 50  |       |       |       | M     | Payment receipt |
+| R3  | 50  |       |       |       | M     | Payment receipt |
+| R4  | 50  |       |       |       | M     | Payment receipt |
+| R5  | 50  |       |       |       | M     | Payment receipt |
+| R6  | 50  |       |       |       | M     | Payment receipt |
+| R7  | 50  |       |       |       | M     | Payment receipt |
+| R8  | 50  |       |       |       | M     | Payment receipt |
+| R9  | 50  |       |       |       | M     | Payment receipt |
+| RA  | 50  |       |       |       | M     | Payment receipt |
+| RB  | 50  |       |       |       | M     | Payment receipt |
+| RC  | 50  |       |       |       | M     | Payment receipt |
+| RD  | 50  |       |       |       | M     | Payment receipt |
+| RE  | 50  |       |       |       | M     | Payment receipt |
+| RF  | 50  |       |       |       | M     | Payment receipt |
+| RG  | 50  |       |       |       | M     | Payment receipt |
+| RH  | 50  |       |       |       | M     | Payment receipt |
+| RI  | 50  |       |       |       | M     | Payment receipt |
 
 Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
 
 ## Postpaid Airtime
 
 **Field 48 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
-|-----|-----|---------|---------|---------|---------|------------------------------------|
-| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
-| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
-| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
-| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
-| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
-| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description                        |
+|-----|-----|-------|-------|-------|-------|------------------------------------|
+| PI  | 6   | M     | ME    | ME    | ME    | Product ID                         |
+| CN  | 24  | M     | ME    | ME    | ME    | Contract number or customer number |
+| NM  | 50  |       | M     | ME    | ME    | Customer name                      |
+| AT  | 12  |       | M     | ME    | ME    | Total amount without point decimal |
+| FR  | 24  |       | M     | ME    | ME    | Forwarding reference number        |
+| FS  | 24  |       | M     | ME    | ME    | Forwarding STAN                    |
 
 Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
 
 ## Prepaid Airtime
 
 **Field 48 Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
-|-----|-----|---------|---------|---------|---------|------------------------------------|
-| PI  | 6   |         |         | M       | ME      | Product ID                         |
-| CN  | 24  |         |         | M       | ME      | Contract number or customer number |
-| AT  | 12  |         |         |         | M       | Total amount without point decimal |
-| FR  | 24  |         |         |         | M       | Forwarding reference number        |
-| FS  | 24  |         |         |         | M       | Forwarding STAN                    |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description                        |
+|-----|-----|-------|-------|-------|-------|------------------------------------|
+| PI  | 6   |       |       | M     | ME    | Product ID                         |
+| CN  | 24  |       |       | M     | ME    | Contract number or customer number |
+| AT  | 12  |       |       |       | M     | Total amount without point decimal |
+| FR  | 24  |       |       |       | M     | Forwarding reference number        |
+| FS  | 24  |       |       |       | M     | Forwarding STAN                    |
 
 Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
 
@@ -1233,13 +1284,13 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 ## Mobile Data
 
 **Field 48 Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
-|-----|-----|---------|---------|---------|---------|------------------------------------|
-| PI  | 6   |         |         | M       | ME      | Product ID                         |
-| CN  | 24  |         |         | M       | ME      | Contract number or customer number |
-| AT  | 12  |         |         |         | M       | Total amount without point decimal |
-| FR  | 24  |         |         |         | M       | Forwarding reference number        |
-| FS  | 24  |         |         |         | M       | Forwarding STAN                    |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description                        |
+|-----|-----|-------|-------|-------|-------|------------------------------------|
+| PI  | 6   |       |       | M     | ME    | Product ID                         |
+| CN  | 24  |       |       | M     | ME    | Contract number or customer number |
+| AT  | 12  |       |       |       | M     | Total amount without point decimal |
+| FR  | 24  |       |       |       | M     | Forwarding reference number        |
+| FS  | 24  |       |       |       | M     | Forwarding STAN                    |
 
 Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
 
@@ -1260,13 +1311,13 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 ## Top Up E-Money
 
 **Field 48 Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
-|-----|-----|---------|---------|---------|---------|------------------------------------|
-| PI  | 6   |         |         | M       | ME      | Product ID                         |
-| CN  | 24  |         |         | M       | ME      | Contract number or customer number |
-| AT  | 12  |         |         |         | M       | Total amount without point decimal |
-| FR  | 24  |         |         |         | M       | Forwarding reference number        |
-| FS  | 24  |         |         |         | M       | Forwarding STAN                    |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description                        |
+|-----|-----|-------|-------|-------|-------|------------------------------------|
+| PI  | 6   |       |       | M     | ME    | Product ID                         |
+| CN  | 24  |       |       | M     | ME    | Contract number or customer number |
+| AT  | 12  |       |       |       | M     | Total amount without point decimal |
+| FR  | 24  |       |       |       | M     | Forwarding reference number        |
+| FS  | 24  |       |       |       | M     | Forwarding STAN                    |
 
 **Field 48 Payment Request Example**
 | TAG | VALUE               | 
@@ -1287,40 +1338,40 @@ Note: Advice requests are the same as payment requests except MTI is 0220 instea
 ## PBB (Pajak Bumi dan Bangunan)
 
 **Field 48 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description                        |
-|-----|-----|---------|---------|---------|---------|------------------------------------|
-| PI  | 6   | M       | ME      | ME      | ME      | Product ID                         |
-| CN  | 24  | M       | ME      | ME      | ME      | Contract number or customer number |
-| NM  | 50  |         | M       | ME      | ME      | Customer name                      |
-| AT  | 12  |         | M       | ME      | ME      | Total amount without point decimal |
-| AC  | 12  | M       | ME      | ME      | ME      | Total admin fee                    |
-| FR  | 24  |         | M       | ME      | ME      | Forwarding reference number        |
-| FS  | 24  |         | M       | ME      | ME      | Forwarding STAN                    |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description                        |
+|-----|-----|-------|-------|-------|-------|------------------------------------|
+| PI  | 6   | M     | ME    | ME    | ME    | Product ID                         |
+| CN  | 24  | M     | ME    | ME    | ME    | Contract number or customer number |
+| NM  | 50  |       | M     | ME    | ME    | Customer name                      |
+| AT  | 12  |       | M     | ME    | ME    | Total amount without point decimal |
+| AC  | 12  | M     | ME    | ME    | ME    | Total admin fee                    |
+| FR  | 24  |       | M     | ME    | ME    | Forwarding reference number        |
+| FS  | 24  |       | M     | ME    | ME    | Forwarding STAN                    |
 
 **Field 57 Inquiry and Payment**
-| Tag | Max | 200 INQ | 210 INQ | 200 PMT | 210 PMT | Description     |
-|-----|-----|---------|---------|---------|---------|-----------------|
-| S0  | 50  |         | M       |         |         | Inquiry screen  |
-| S1  | 50  |         | M       |         |         | Inquiry screen  |
-| S2  | 50  |         | M       |         |         | Inquiry screen  |
-| S3  | 50  |         | M       |         |         | Inquiry screen  |
-| S4  | 50  |         | M       |         |         | Inquiry screen  |
-| S5  | 50  |         | M       |         |         | Inquiry screen  |
-| S6  | 50  |         | M       |         |         | Inquiry screen  |
-| S7  | 50  |         | M       |         |         | Inquiry screen  |
-| S8  | 50  |         | M       |         |         | Inquiry screen  |
-| S9  | 50  |         | M       |         |         | Inquiry screen  |
-| SA  | 50  |         | M       |         |         | Inquiry screen  |
-| R0  | 50  |         |         |         | M       | Payment receipt |
-| R1  | 50  |         |         |         | M       | Payment receipt |
-| R2  | 50  |         |         |         | M       | Payment receipt |
-| R3  | 50  |         |         |         | M       | Payment receipt |
-| R4  | 50  |         |         |         | M       | Payment receipt |
-| R5  | 50  |         |         |         | M       | Payment receipt |
-| R6  | 50  |         |         |         | M       | Payment receipt |
-| R7  | 50  |         |         |         | M       | Payment receipt |
-| R8  | 50  |         |         |         | M       | Payment receipt |
-| R9  | 50  |         |         |         | M       | Payment receipt |
+| Tag | Max | 200 I | 210 I | 200 P | 210 P | Description     |
+|-----|-----|-------|-------|-------|-------|-----------------|
+| S0  | 50  |       | M     |       |       | Inquiry screen  |
+| S1  | 50  |       | M     |       |       | Inquiry screen  |
+| S2  | 50  |       | M     |       |       | Inquiry screen  |
+| S3  | 50  |       | M     |       |       | Inquiry screen  |
+| S4  | 50  |       | M     |       |       | Inquiry screen  |
+| S5  | 50  |       | M     |       |       | Inquiry screen  |
+| S6  | 50  |       | M     |       |       | Inquiry screen  |
+| S7  | 50  |       | M     |       |       | Inquiry screen  |
+| S8  | 50  |       | M     |       |       | Inquiry screen  |
+| S9  | 50  |       | M     |       |       | Inquiry screen  |
+| SA  | 50  |       | M     |       |       | Inquiry screen  |
+| R0  | 50  |       |       |       | M     | Payment receipt |
+| R1  | 50  |       |       |       | M     | Payment receipt |
+| R2  | 50  |       |       |       | M     | Payment receipt |
+| R3  | 50  |       |       |       | M     | Payment receipt |
+| R4  | 50  |       |       |       | M     | Payment receipt |
+| R5  | 50  |       |       |       | M     | Payment receipt |
+| R6  | 50  |       |       |       | M     | Payment receipt |
+| R7  | 50  |       |       |       | M     | Payment receipt |
+| R8  | 50  |       |       |       | M     | Payment receipt |
+| R9  | 50  |       |       |       | M     | Payment receipt |
 
 Note: Advice requests are the same as payment requests except MTI is 0220 instead of 0200
 
@@ -1464,54 +1515,54 @@ Positions 5 to 6 (To Account Type)
 ## Response Code
 
 | Code | Description                                 |
-| -- | ----------------------------------------------|
-| 00 | Success                                       |
-| 01 | Need To Sign On                               |
-| 02 | Internal To Provider Down                     |
-| 03 | Request Time Out                              |
-| 05 | Do Not Honor                                  |
-| 07 | Invalid Mandatory Field                       |
-| 08 | Invalid Message Type Indicator                |
-| 09 | Incomplete Message                            |
-| 10 | Preset Maximum Transaction Loaded Exceeded    |
-| 12 | Failed To Reverse Transaction Committed 1     |
-| 13 | Invalid Amount                                |
-| 14 | Invalid Card Number                           |
-| 21 | Advice Failed                                 |
-| 24 | Invalid Processing Code                       |
-| 25 | Invalid Merchant Type                         |
-| 26 | Invalid Institution Identification Code       |
-| 30 | Invalid Product Code                          |
-| 31 | Invalid Customer Id 1                         |
-| 32 | Invalid Network Management Information Code   |
-| 41 | Lost Card                                     |
-| 43 | Invalid Card                                  |
-| 48 | No Payment Record 1                           |
-| 54 | Bill Already Paid                             |
-| 56 | No Card Record                                |
-| 58 | Transaction Not Permit                        |
-| 59 | Invalid Transaction Amount                    |
-| 60 | Invalid Minimum Amount 1                      |
-| 62 | Invalid District Code                         |
-| 65 | Exceeded Transaction Frequency Limit          |
-| 68 | Response Receive Too Late                     |
-| 69 | Unable Decrypt Track 2                        |
-| 70 | MLPO Reference Number Already Exist           |
-| 71 | Bill Amount Le Zero                           |
-| 72 | Over quota                                    |
-| 74 | Customer Id Suspended                         |
-| 75 | Pin Tries Exceeded                            |
-| 76 | Insufficient Fund 2                           |
-| 81 | Cut Off                                       |
-| 85 | Card Is Inactive                              |
-| 86 | Card Is Blocked                               |
-| 88 | Bill Not Available 1                          |
-| 89 | Link To Service Provider Down                 |
-| 90 | Cut Off In Progress                           |
-| 91 | Payment Without Success Inquiry               |
-| 92 | Transaction Not Found                         |
-| 94 | Duplicated Transmission                       |
-| 96 | System Malfunction                            |
-| 97 | Invalid ARQC                                  |
-| 98 | Internal Provider System Error                |
-| 99 | Internal Ba Server Error                      |
+| ---- | ----------------------------------------------|
+| 00   | Success                                       |
+| 01   | Need To Sign On                               |
+| 02   | Internal To Provider Down                     |
+| 03   | Request Time Out                              |
+| 05   | Do Not Honor                                  |
+| 07   | Invalid Mandatory Field                       |
+| 08   | Invalid Message Type Indicator                |
+| 09   | Incomplete Message                            |
+| 10   | Preset Maximum Transaction Loaded Exceeded    |
+| 12   | Failed To Reverse Transaction Committed 1     |
+| 13   | Invalid Amount                                |
+| 14   | Invalid Card Number                           |
+| 21   | Advice Failed                                 |
+| 24   | Invalid Processing Code                       |
+| 25   | Invalid Merchant Type                         |
+| 26   | Invalid Institution Identification Code       |
+| 30   | Invalid Product Code                          |
+| 31   | Invalid Customer Id 1                         |
+| 32   | Invalid Network Management Information Code   |
+| 41   | Lost Card                                     |
+| 43   | Invalid Card                                  |
+| 48   | No Payment Record 1                           |
+| 54   | Bill Already Paid                             |
+| 56   | No Card Record                                |
+| 58   | Transaction Not Permit                        |
+| 59   | Invalid Transaction Amount                    |
+| 60   | Invalid Minimum Amount 1                      |
+| 62   | Invalid District Code                         |
+| 65   | Exceeded Transaction Frequency Limit          |
+| 68   | Response Receive Too Late                     |
+| 69   | Unable Decrypt Track 2                        |
+| 70   | MLPO Reference Number Already Exist           |
+| 71   | Bill Amount Le Zero                           |
+| 72   | Over quota                                    |
+| 74   | Customer Id Suspended                         |
+| 75   | Pin Tries Exceeded                            |
+| 76   | Insufficient Fund 2                           |
+| 81   | Cut Off                                       |
+| 85   | Card Is Inactive                              |
+| 86   | Card Is Blocked                               |
+| 88   | Bill Not Available 1                          |
+| 89   | Link To Service Provider Down                 |
+| 90   | Cut Off In Progress                           |
+| 91   | Payment Without Success Inquiry               |
+| 92   | Transaction Not Found                         |
+| 94   | Duplicated Transmission                       |
+| 96   | System Malfunction                            |
+| 97   | Invalid ARQC                                  |
+| 98   | Internal Provider System Error                |
+| 99   | Internal Ba Server Error                      |
